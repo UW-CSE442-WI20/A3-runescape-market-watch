@@ -1,0 +1,51 @@
+html {
+}
+
+.Container {
+  display: grid;
+  grid-template-columns: 250px auto;
+  height: 100vh;
+
+  .Sidebar {
+    border: 1px solid black;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .SidebarItem {
+      display: flex;
+      flex-direction: row;
+      .SidebarItemImage {
+        width: 50px;
+      }
+    }
+  }
+  
+  .Content {
+    .ItemInfo {
+      display: grid;
+      grid-template-areas: "pic name"
+                           "pic stats";
+      grid-template-rows: auto 1fr;
+      grid-template-columns: auto 1fr;
+      
+      .LargeItemImage {
+        width: 250px;
+        height: 250px;
+        grid-area: pic;
+      }
+  
+      .LargeItemName {
+        font-size: large;
+        grid-area: name;
+      }
+
+      .Statistics {
+        grid-area: stats;
+
+      }
+    }
+
+     
+  }
+}
+
