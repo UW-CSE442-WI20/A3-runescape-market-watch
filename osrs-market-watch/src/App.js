@@ -12,9 +12,6 @@ class App extends Component {
       items: null
     };
 
-    console.log(ItemMetadata)
-
-    this.readCSV = this.readCSV.bind(this);
     this.csvToJson = this.csvToJson.bind(this);
   }
 
