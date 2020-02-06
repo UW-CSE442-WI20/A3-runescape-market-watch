@@ -20,16 +20,17 @@ class App extends Component {
 
   // async load the csv file
   componentDidMount() {
-    this.readCSV("./data.csv").then(csvData => {
-      Papa.parse(csvData, {
-        complete: this.csvToJson,
-        header: true,
-        skipEmptyLines: true
-      });
+    Papa.parse('./data.csv', {
+      complete: this.csvToJson,
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      delimiter: ','
     });
   }
 
   csvToJson(csvData) {
+    console.log(csvData)
     let itemMap = {};
 
     // sort by timestamp so all values are
@@ -78,17 +79,6 @@ class App extends Component {
           <p>{item.name}</p>
         </div>
       );
-    });
-  }
-
-  readCSV(path) {
-    return fetch(path).then(function(response) {
-      let reader = response.body.getReader();
-      let decoder = new TextDecoder("utf-8");
-
-      return reader.read().then(function(result) {
-        return decoder.decode(result.value);
-      });
     });
   }
 
