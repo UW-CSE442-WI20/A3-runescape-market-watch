@@ -9,7 +9,8 @@ class App extends Component {
     super();
     this.state = {
       loading: true,
-      items: null
+      items: null,
+      activeItemId: null
     };
 
     this.csvToJson = this.csvToJson.bind(this);
@@ -59,19 +60,24 @@ class App extends Component {
       });
     }
 
+    console.log(sidebarItems[0].name);
+
     this.setState({
       loading: false,
       items: itemMap,
-      sidebarItems: sidebarItems
+      sidebarItems: sidebarItems,
+      activeItemId: sidebarItems[0].id
     });
   }
 
   renderSidebar(sidebarItems) {
     return sidebarItems.map((item, i) => {
       let src = item.id in ItemMetadata ? ItemMetadata[item.id].icon : "";
+      let isActive = item.id === this.state.activeItemId;
+      let className = isActive ? "SidebarItem Active" : "SidebarItem"; 
       
       return (
-        <div className="SidebarItem" key={i}>
+        <div className={className} key={i} onClick={() => this.setState({activeItemId: item.id})}>
           <img className="SidebarItemImage" src={src} alt={"MEANINGFUL ALT TEXT"}/>
           <p>{item.name}</p>
         </div>
@@ -84,29 +90,33 @@ class App extends Component {
       return <div>im loading mothafugga</div>
     }
 
+    const { activeItemId } = this.state;
+    const metadata = ItemMetadata[activeItemId]; // type, image urls
+    const pricedata = this.state.sidebarItems.filter((e) => e.id === activeItemId)[0]; // daily values, and image
+    const pricehistory = this.state.items[activeItemId]; // full price history
+
     return (
       <div className="Container">
         <div className="Sidebar">
           {
             this.renderSidebar(this.state.sidebarItems)
           }
-          {/* <div className="SidebarListItem">test</div> */}
         </div>
         <div className="Content">
           <div className="ItemInfo">
             <img
               className="LargeItemImage"
-              src={`./test.gif`}
-              alt={"MEANINGFUL ALT TEXT"}
+              src={metadata.icon}
+              alt={`${metadata.name} thumbnail`}
             />
-            <h1 className="LargeItemName">Abyssal Whip</h1>
+            <h1 className="LargeItemName">{pricedata.name}</h1>
             <div className="Statistics">
-              <div className="Statistic">{`Price: ${0}`}</div>
-              <div className="Statistic">{`Volume: ${0}`}</div>
+              <div className="Statistic">{`Price: ${pricedata.average}`}</div>
+              <div className="Statistic">{`Volume: ${pricedata.volume}`}</div>
+              <div className="Statistic">{`Daily: ${pricedata.daily}`}</div>
               <div className="Statistic">{`Daily % Change: ${0}`}</div>
               <div className="Statistic">{`1 Month % Change: ${0}`}</div>
               <div className="Statistic">{`3 Month % Change: ${0}`}</div>
-              <div className="Statistic">{`6 Month % Change: ${0}`}</div>
             </div>
           </div>
         </div>
