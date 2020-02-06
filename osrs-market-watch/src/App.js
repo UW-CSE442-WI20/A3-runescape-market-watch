@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import "./App.scss";
+
 import Papa from "papaparse";
+import ItemMetadata from './data/better_items.json';
 
 class App extends Component {
   constructor() {
@@ -9,6 +11,8 @@ class App extends Component {
       loading: true,
       items: null
     };
+
+    console.log(ItemMetadata)
 
     this.readCSV = this.readCSV.bind(this);
     this.csvToJson = this.csvToJson.bind(this);
@@ -66,9 +70,11 @@ class App extends Component {
 
   renderSidebar(sidebarItems) {
     return sidebarItems.map((item, i) => {
+      let src = item.id in ItemMetadata ? ItemMetadata[item.id].icon : "";
+      
       return (
         <div className="SidebarItem" key={i}>
-          <img className="SidebarItemImage" src={'./test.gif'} alt={"MEANINGFUL ALT TEXT"}/>
+          <img className="SidebarItemImage" src={src} alt={"MEANINGFUL ALT TEXT"}/>
           <p>{item.name}</p>
         </div>
       );
