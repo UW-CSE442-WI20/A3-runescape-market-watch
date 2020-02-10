@@ -98,7 +98,8 @@ class App extends Component {
 
     const chartData = pricehistory.map((row) => ({
       'ts': new Date(row['ts']),
-      'daily': row['daily']
+      'daily': +row['daily'],
+      'volume': +row['volume']
     }))
 
     return (
