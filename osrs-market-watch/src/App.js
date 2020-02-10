@@ -3,6 +3,7 @@ import "./App.scss";
 
 import Papa from "papaparse";
 import ItemMetadata from './data/better_items.json';
+import PriceVolumeChart from './PriceVolumeChart.js';
 
 class App extends Component {
   constructor() {
@@ -95,6 +96,11 @@ class App extends Component {
     const pricedata = this.state.sidebarItems.filter((e) => e.id === activeItemId)[0]; // daily values, and image
     const pricehistory = this.state.items[activeItemId]; // full price history
 
+    const chartData = pricehistory.map((row) => ({
+      'ts': new Date(row['ts']),
+      'daily': row['daily']
+    }))
+
     return (
       <div className="Container">
         <div className="Sidebar">
@@ -119,6 +125,7 @@ class App extends Component {
               <div className="Statistic">{`3 Month % Change: ${0}`}</div>
             </div>
           </div>
+          <PriceVolumeChart data={chartData}/>
         </div>
       </div>
     );
