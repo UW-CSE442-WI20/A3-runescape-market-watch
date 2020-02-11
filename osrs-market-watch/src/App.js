@@ -99,6 +99,7 @@ class App extends Component {
     const chartData = pricehistory.map((row) => ({
       'ts': new Date(row['ts']),
       'daily': +row['daily'],
+      'average': +row['average'],
       'volume': +row['volume']
     }))
 
@@ -118,12 +119,12 @@ class App extends Component {
             />
             <h1 className="LargeItemName">{pricedata.name}</h1>
             <div className="Statistics">
-              <div className="Statistic">{`Price: ${pricedata.average}`}</div>
-              <div className="Statistic">{`Volume: ${pricedata.volume}`}</div>
-              <div className="Statistic">{`Daily: ${pricedata.daily}`}</div>
-              <div className="Statistic">{`Daily % Change: ${0}`}</div>
-              <div className="Statistic">{`1 Month % Change: ${0}`}</div>
-              <div className="Statistic">{`3 Month % Change: ${0}`}</div>
+              <div className="Statistic">{`Avg. Price: ${pricedata.average}`}</div>
+              <div className="Statistic">{`Daily Volume: ${pricedata.volume}`}</div>
+              <div className="Statistic">{`Daily Price: ${pricedata.daily}`}</div>
+              <div className="Statistic">{`Daily % Change: ${-1}`}</div>
+              <div className="Statistic">{`1 Month % Change: ${-1}`}</div>
+              <div className="Statistic">{`3 Month % Change: ${-1}`}</div>
             </div>
           </div>
           <PriceVolumeChart data={chartData}/>

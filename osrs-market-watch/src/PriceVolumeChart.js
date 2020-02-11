@@ -49,41 +49,32 @@ class PriceVolumeChart extends Component {
     };
 
     drawChart() {
+        // TODO get the height of this container from ref or whatever, rather than using the window dimensions
         const { data } = this.props;
-        const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+        const margin = { top: 100, right: 100, bottom: 100, left: 100 };
         const width = window.innerWidth - margin.left - margin.right; // Use the window's width
         const height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
         
         const { node } = this;
 
         const svg = d3.select(node.current);
+        
         // find data range
-        const xMin = d3.min(data, d => {
-            return d['ts'];
-        });
-
-        const xMax = d3.max(data, d => {
-            return d['ts'];
-        });
-
-        const yMin = d3.min(data, d => {
-            return d['daily'];
-        });
-
-        const yMax = d3.max(data, d => {
-            return d['daily'];
-        });
+        const xMin = d3.min(data, d => d.ts);
+        const xMax = d3.max(data, d => d.ts);
+        const yMin = d3.min(data, d => d.daily);
+        const yMax = d3.max(data, d => d.daily);
 
         // scale using range
         const xScale = d3
-        .scaleTime()
-        .domain([xMin, xMax])
-        .range([0, width]);
+            .scaleTime()
+            .domain([xMin, xMax])
+            .range([0, width]);
 
         const yScale = d3
-        .scaleLinear()
-        .domain([yMin - 5, yMax])
-        .range([height, 0]);
+            .scaleLinear()
+            .domain([yMin - 5, yMax])
+            .range([height, 0]);
 
         svg.selectAll("*").remove();
 
@@ -111,12 +102,8 @@ class PriceVolumeChart extends Component {
           // generates lines when called
         const line = d3
             .line()
-            .x(d => {
-                return xScale(d['ts']);
-            })
-            .y(d => {
-                return yScale(d['daily']);
-        });
+            .x(d => xScale(d.ts))
+            .y(d => yScale(d.daily));
         
         console.log(data)
 
@@ -157,7 +144,7 @@ class PriceVolumeChart extends Component {
           d3.selectAll('.focus line').style('stroke-dasharray', '3 3');
         
           //returs insertion point
-          const bisectDate = d3.bisector(d => d.date).left;
+          const bisectDate = d3.bisector(d => d.ts).left;
         
           /* mouseover function to generate crosshair */
           function generateCrosshair() {
@@ -190,7 +177,7 @@ class PriceVolumeChart extends Component {
               .attr('y1', 0)
               .attr('y2', height - yScale(currentPoint['daily']));
         
-            // updates the legend to display the date, open, close, high, low, and volume of the selected mouseover area
+            // updates the legend to display the data at the selected mouseover area
             updateLegends(currentPoint);
           }
         
@@ -261,14 +248,15 @@ class PriceVolumeChart extends Component {
               if (i === 0) {
                 return '#03a678';
               } else {
-                return volData[i - 1].close > d.close ? '#c0392b' : '#03a678'; // green bar if price is rising during that period, and red when price  is falling
+                // TODO change this, we dont have open and close values
+                // green bar if price is rising during that period, and red when price  is falling
+                return volData[i - 1].close > d.close ? '#c0392b' : '#03a678'; 
               }
             })
             .attr('width', 1)
             .attr('height', d => {
               return height - yVolumeScale(d['volume']);
             });
-
     }
 }
 
