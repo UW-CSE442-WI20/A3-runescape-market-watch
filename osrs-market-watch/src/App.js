@@ -6,15 +6,16 @@ import ItemMetadata from './data/better_items.json';
 import PriceVolumeChart from './PriceVolumeChart.js';
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       loading: true,
       items: null,
       activeItemId: null
     };
-
+    this.chart = React.createRef();
     this.csvToJson = this.csvToJson.bind(this);
+    this.onResize = this.onResize.bind(this);
   }
 
   // async load the csv file
@@ -26,16 +27,23 @@ class App extends Component {
       skipEmptyLines: true,
       delimiter: ','
     });
+    
+    window.addEventListener('resize', this.onResize, false);
+    this.onResize();
+  }
+
+  onResize() {
+    this.setState(
+      { chartWidth: this.chart.current ? this.chart.current.offsetWidth : 0,
+        chartHeight: this.chart.current ? this.chart.current.offsetHeight : 0});
   }
 
   csvToJson(csvData) {
-    console.log(csvData)
     let itemMap = {};
 
     // sort by timestamp so all values are
     // inserted into itemMap in sorted order
     csvData.data.sort((a, b) => new Date(a.ts) - new Date(b.ts));
-    console.log(csvData);
     csvData.data.forEach(line => {
       if (!(line.id in itemMap)) {
         itemMap[line.id] = [];
@@ -88,13 +96,14 @@ class App extends Component {
 
   render() {
     if (this.state.loading) {
-      return <div>im loading mothafugga</div>
+      return <div>im loading</div>
     }
 
-    const { activeItemId } = this.state;
+    const { activeItemId, chartWidth, chartHeight } = this.state;
     const metadata = ItemMetadata[activeItemId]; // type, image urls
     const pricedata = this.state.sidebarItems.filter((e) => e.id === activeItemId)[0]; // daily values, and image
     const pricehistory = this.state.items[activeItemId]; // full price history
+
 
     const chartData = pricehistory.map((row) => ({
       'ts': new Date(row['ts']),
@@ -127,7 +136,12 @@ class App extends Component {
               <div className="Statistic">{`3 Month % Change: ${-1}`}</div>
             </div>
           </div>
-          <PriceVolumeChart data={chartData}/>
+          <div className="ChartContainer" ref={this.chart}>
+            <PriceVolumeChart data={chartData}
+                              width ={ chartWidth }
+                              height={ chartHeight }/>
+          </div>
+          
         </div>
       </div>
     );

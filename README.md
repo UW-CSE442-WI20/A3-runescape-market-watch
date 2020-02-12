@@ -8,6 +8,8 @@
   in sidebar
 - sortable sidebar? (maybe a stretch goal) (preston)
 - styles (preston)
+- change units (gp, 100k, 500M, 1.5B, etc...)
+- proper resize... maybe cheat with breakpoints?
 
 
 ### Scraper

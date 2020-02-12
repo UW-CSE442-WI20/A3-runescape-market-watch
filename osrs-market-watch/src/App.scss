@@ -1,4 +1,8 @@
+$bg: #e7e7e7;
+$text: #222;
+
 html {
+  background: $bg;
 }
 
 .Container {
@@ -14,6 +18,7 @@ html {
     .SidebarItem {
       display: flex;
       flex-direction: row;
+      color: $text;
       cursor: pointer;
       
       .SidebarItemImage {
@@ -28,16 +33,30 @@ html {
   }
   
   .Content {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 100%;
+
+    .ChartContainer {
+      flex-basis: 0px;
+      flex-grow: 1;
+      max-height: 100%;
+      margin: 50px;
+
+      
+    }
+
     .ItemInfo {
       display: grid;
       grid-template-areas: "pic name"
                            "pic stats";
       grid-template-rows: auto 1fr;
       grid-template-columns: auto 1fr;
+
       
       .LargeItemImage {
-        width: 250px;
-        height: 250px;
+        width: 300px;
+        height: 300px;
         grid-area: pic;
       }
   
