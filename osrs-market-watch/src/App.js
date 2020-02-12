@@ -34,8 +34,8 @@ class App extends Component {
 
   onResize() {
     this.setState(
-      { chartWidth: this.chart.current ? this.chart.current.offsetWidth : 0,
-        chartHeight: this.chart.current ? this.chart.current.offsetHeight : 0});
+      { chartWidth: window.innerWidth - 250,
+        chartHeight: window.innerHeight - 250});
   }
 
   csvToJson(csvData) {

@@ -25,9 +25,9 @@ class PriceVolumeChart extends Component {
     drawChart() {
         // TODO get the height of this container from ref or whatever, rather than using the window dimensions
         const { data } = this.props;
-        const margin = { top: 0, right: 0, bottom: 100, left: 100 };
-        const width = Math.max(0, this.props.width - margin.left - margin.right);
-        const height = Math.max(0, 800 - margin.top - margin.bottom); // Use the window's height
+        const margin = { top: 0, right: 0, bottom: 100, left: 50 };
+        const width = Math.max(0, this.props.width - margin.left - margin.right - 100);
+        const height = Math.max(0, this.props.height - margin.top - margin.bottom - 100); // Use the window's height
         
         const { node } = this;
 
@@ -38,6 +38,8 @@ class PriceVolumeChart extends Component {
         const xMax = d3.max(data, d => d.ts);
         const yMin = d3.min(data, d => d.daily);
         const yMax = d3.max(data, d => d.daily);
+
+        console.log(width, height)
 
         // scale using range
         const xScale = d3
@@ -78,8 +80,6 @@ class PriceVolumeChart extends Component {
             .x(d => xScale(d.ts))
             .y(d => yScale(d.daily));
         
-        console.log(data)
-
         svg
             .append('path')
             .data([data]) // binds data to the line
@@ -190,7 +190,6 @@ class PriceVolumeChart extends Component {
         
           /* Volume series bars */
           const volData = data.filter(d => d['volume'] !== null );
-          console.log(volData)
         
           const yMinVolume = d3.min(volData, d => {
             return Math.min(d['volume']);

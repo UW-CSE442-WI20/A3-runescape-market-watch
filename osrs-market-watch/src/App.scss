@@ -36,6 +36,7 @@ html {
     display: inline-flex;
     flex-direction: column;
     min-width: 100%;
+    overflow: hidden;
 
     .ChartContainer {
       flex-basis: 0px;
@@ -55,18 +56,21 @@ html {
 
       
       .LargeItemImage {
-        width: 300px;
-        height: 300px;
+        width: 250px;
+        height: 250px;
         grid-area: pic;
       }
   
       .LargeItemName {
-        font-size: large;
+        font-size: 28px;
         grid-area: name;
+        color: $text;
       }
 
       .Statistics {
         grid-area: stats;
+        font-size: 18px;
+        color: $text;
 
       }
     }
