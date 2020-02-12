@@ -5,6 +5,9 @@ import Papa from "papaparse";
 import ItemMetadata from './data/better_items.json';
 import PriceVolumeChart from './PriceVolumeChart.js';
 
+const SIDEBAR_WIDTH = 250;
+const ITEM_HEADER_HEIGHT = 250;
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -34,8 +37,8 @@ class App extends Component {
 
   onResize() {
     this.setState(
-      { chartWidth: window.innerWidth - 250,
-        chartHeight: window.innerHeight - 250});
+      { chartWidth: window.innerWidth - SIDEBAR_WIDTH,
+        chartHeight: window.innerHeight - ITEM_HEADER_HEIGHT});
   }
 
   csvToJson(csvData) {
