@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/osrs-market-watch/static/css/main.33ada554.chunk.css",
+    "main.js": "/osrs-market-watch/static/js/main.63c84342.chunk.js",
+    "main.js.map": "/osrs-market-watch/static/js/main.63c84342.chunk.js.map",
+    "runtime-main.js": "/osrs-market-watch/static/js/runtime-main.44cc497b.js",
+    "runtime-main.js.map": "/osrs-market-watch/static/js/runtime-main.44cc497b.js.map",
+    "static/js/2.3fb96fd6.chunk.js": "/osrs-market-watch/static/js/2.3fb96fd6.chunk.js",
+    "static/js/2.3fb96fd6.chunk.js.map": "/osrs-market-watch/static/js/2.3fb96fd6.chunk.js.map",
+    "index.html": "/osrs-market-watch/index.html",
+    "precache-manifest.ed3a8801e1503c5ef3a32673923b72ba.js": "/osrs-market-watch/precache-manifest.ed3a8801e1503c5ef3a32673923b72ba.js",
+    "service-worker.js": "/osrs-market-watch/service-worker.js",
+    "static/css/main.33ada554.chunk.css.map": "/osrs-market-watch/static/css/main.33ada554.chunk.css.map",
+    "static/js/2.3fb96fd6.chunk.js.LICENSE.txt": "/osrs-market-watch/static/js/2.3fb96fd6.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.44cc497b.js",
+    "static/js/2.3fb96fd6.chunk.js",
+    "static/css/main.33ada554.chunk.css",
+    "static/js/main.63c84342.chunk.js"
+  ]
+}
