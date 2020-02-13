@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import "./App.scss";
 
 import Papa from "papaparse";
+import * as d3 from "d3";
 import ItemMetadata from './data/better_items.json';
 import PriceVolumeChart from './PriceVolumeChart.js';
 
@@ -19,6 +20,7 @@ class App extends Component {
     this.chart = React.createRef();
     this.csvToJson = this.csvToJson.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.filterSidebar = this.filterSidebar.bind(this);
   }
 
   // async load the csv file
@@ -78,6 +80,7 @@ class App extends Component {
       loading: false,
       items: itemMap,
       sidebarItems: sidebarItems,
+      filteredItems: sidebarItems,
       activeItemId: sidebarItems[0].id
     });
   }
@@ -94,6 +97,16 @@ class App extends Component {
           <p>{item.name}</p>
         </div>
       );
+    });
+  }
+  
+  filterSidebar(e) {
+    const text = e.target.value.toLowerCase();
+    const newItems = this.state.sidebarItems.filter(
+      item => item.name.toLowerCase().startsWith(text)
+    );
+    this.setState({
+      filteredItems: newItems
     });
   }
 
@@ -115,11 +128,17 @@ class App extends Component {
       'volume': +row['volume']
     }))
 
+    const gpFormat = gp => `${d3.format('.3~s')(gp)} gp`;
+    const volFormat = d3.format('.3~s');
+
+
+    const inputStyles = {width: '100%'}
     return (
       <div className="Container">
         <div className="Sidebar">
+          <input type="text" className="input" style={inputStyles} placeholder="Search..." onChange={this.filterSidebar} />
           {
-            this.renderSidebar(this.state.sidebarItems)
+            this.renderSidebar(this.state.filteredItems)
           }
         </div>
         <div className="Content">
@@ -131,18 +150,18 @@ class App extends Component {
             />
             <h1 className="LargeItemName">{pricedata.name}</h1>
             <div className="Statistics">
+              <div className="Statistic">{`Daily Price: ${gpFormat(pricedata.daily)}`}</div>
+              <div className="Statistic">{`Daily Volume: ${volFormat(pricedata.volume)}`}</div>
               <div className="Statistic">{`Avg. Price: ${pricedata.average}`}</div>
-              <div className="Statistic">{`Daily Volume: ${pricedata.volume}`}</div>
-              <div className="Statistic">{`Daily Price: ${pricedata.daily}`}</div>
-              <div className="Statistic">{`Daily % Change: ${-1}`}</div>
+              {/* <div className="Statistic">{`Daily % Change: ${-1}`}</div>
               <div className="Statistic">{`1 Month % Change: ${-1}`}</div>
-              <div className="Statistic">{`3 Month % Change: ${-1}`}</div>
+              <div className="Statistic">{`3 Month % Change: ${-1}`}</div> */}
             </div>
           </div>
-          <div className="ChartContainer" ref={this.chart}>
+          <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
             <PriceVolumeChart data={chartData}
-                              width ={ chartWidth }
-                              height={ chartHeight }/>
+                              width={chartWidth}
+                              height={chartHeight} />
           </div>
           
         </div>
