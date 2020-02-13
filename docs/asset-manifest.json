@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/osrs-market-watch/static/css/main.33ada554.chunk.css",
-    "main.js": "/osrs-market-watch/static/js/main.63c84342.chunk.js",
-    "main.js.map": "/osrs-market-watch/static/js/main.63c84342.chunk.js.map",
-    "runtime-main.js": "/osrs-market-watch/static/js/runtime-main.44cc497b.js",
-    "runtime-main.js.map": "/osrs-market-watch/static/js/runtime-main.44cc497b.js.map",
-    "static/js/2.3fb96fd6.chunk.js": "/osrs-market-watch/static/js/2.3fb96fd6.chunk.js",
-    "static/js/2.3fb96fd6.chunk.js.map": "/osrs-market-watch/static/js/2.3fb96fd6.chunk.js.map",
-    "index.html": "/osrs-market-watch/index.html",
-    "precache-manifest.ed3a8801e1503c5ef3a32673923b72ba.js": "/osrs-market-watch/precache-manifest.ed3a8801e1503c5ef3a32673923b72ba.js",
-    "service-worker.js": "/osrs-market-watch/service-worker.js",
-    "static/css/main.33ada554.chunk.css.map": "/osrs-market-watch/static/css/main.33ada554.chunk.css.map",
-    "static/js/2.3fb96fd6.chunk.js.LICENSE.txt": "/osrs-market-watch/static/js/2.3fb96fd6.chunk.js.LICENSE.txt"
+    "main.css": "/A3-runescape-market-watch/static/css/main.33ada554.chunk.css",
+    "main.js": "/A3-runescape-market-watch/static/js/main.db50bab1.chunk.js",
+    "main.js.map": "/A3-runescape-market-watch/static/js/main.db50bab1.chunk.js.map",
+    "runtime-main.js": "/A3-runescape-market-watch/static/js/runtime-main.dbc3d08f.js",
+    "runtime-main.js.map": "/A3-runescape-market-watch/static/js/runtime-main.dbc3d08f.js.map",
+    "static/js/2.3fb96fd6.chunk.js": "/A3-runescape-market-watch/static/js/2.3fb96fd6.chunk.js",
+    "static/js/2.3fb96fd6.chunk.js.map": "/A3-runescape-market-watch/static/js/2.3fb96fd6.chunk.js.map",
+    "index.html": "/A3-runescape-market-watch/index.html",
+    "precache-manifest.bbc45fbe3456fc6417bdda8b532bd81d.js": "/A3-runescape-market-watch/precache-manifest.bbc45fbe3456fc6417bdda8b532bd81d.js",
+    "service-worker.js": "/A3-runescape-market-watch/service-worker.js",
+    "static/css/main.33ada554.chunk.css.map": "/A3-runescape-market-watch/static/css/main.33ada554.chunk.css.map",
+    "static/js/2.3fb96fd6.chunk.js.LICENSE.txt": "/A3-runescape-market-watch/static/js/2.3fb96fd6.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.44cc497b.js",
+    "static/js/runtime-main.dbc3d08f.js",
     "static/js/2.3fb96fd6.chunk.js",
     "static/css/main.33ada554.chunk.css",
-    "static/js/main.63c84342.chunk.js"
+    "static/js/main.db50bab1.chunk.js"
   ]
 }
