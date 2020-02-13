@@ -1,8 +1,11 @@
+@import "loading";
+
 $bg: #e7e7e7;
 $text: #222;
 
 html {
   background: $bg;
+  overflow: hidden;
 }
 
 .Container {

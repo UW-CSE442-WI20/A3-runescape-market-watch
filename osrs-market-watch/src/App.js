@@ -111,9 +111,26 @@ class App extends Component {
     });
   }
 
+  renderLoadingAnimation() {
+    return (
+        <div className="LoadingContainer">
+            <div className="lds-roller" style={{"color": "black"}}>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    );
+}
+
   render() {
     if (this.state.loading) {
-      return <div>im loading</div>
+      return this.renderLoadingAnimation()
     }
 
     const { activeItemId, chartWidth, chartHeight } = this.state;
