@@ -5,6 +5,15 @@ We approached this project from a utility perspective - we wanted to build a too
 
 We started by sketching our designs and then Preston built the project skeleton in React, handling state management and CSS on the main page. Jake built the d3 visualization, taking inspiration from [this article](https://www.freecodecamp.org/news/how-to-build-historical-price-charts-with-d3-js-72214aaf6ba3/). While Jake developed the visualization, Preston translated the d3 to be React compatible, which included updating the state of the d3 visualiztion as users interact with other elements in the DOM. Preston wrote the original code for pulling the dataset, as well as all the data transformations required to render our charts in the browser. Jake handled building and deploying our final deliverable to github pages, and Preston did the write up! We spent about 10 - 12 hours each on this project. The most time consuming portion of this project was getting the d3 visualization to behave exactly as we wanted - things like adjusting the margins, centering, and responsiveness of the chart took many minute adjustments and involved making changes to both the React and d3 codebases.
 
+### Scraper
+The data scraping utility is written in python and produces data in the following format:
+
+`name, id, timestamp, daily, average, volume`
+
+It needs to be updated to be robust, resiliant against errors / rate limits, and should be run on a daily schedule.
+
+### Market Watch UI
+This is a React project that makes use of the data produced by the scraper. It consists of a suite of components, with each d3 data vis encapsulated in its own component.
 
 #### TODO
 - [ ] python scraper, daily pulls and maybe a db, osbuddy data too? (jake/preston)
@@ -15,14 +24,3 @@ We started by sketching our designs and then Preston built the project skeleton 
 - [x] styles (preston)
 - [x] change units (gp, 100k, 500M, 1.5B, etc...)
 - [x] proper resize... maybe cheat with breakpoints?
-
-
-### Scraper
-The data scraping utility is written in python and produces data in the following format:
-
-`name, id, timestamp, daily, average, volume`
-
-It needs to be updated to be robust, resiliant against errors / rate limits, and should be run on a daily schedule.
-
-### Market Watch UI
-This is a React project that makes use of the data produced by the scraper. It consists of a suite of components, with each d3 data vis encapsulated in its own component.
