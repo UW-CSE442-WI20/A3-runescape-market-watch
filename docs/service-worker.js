@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/A3-runescape-market-watch/precache-manifest.bbc45fbe3456fc6417bdda8b532bd81d.js"
+  "/A3-runescape-market-watch/precache-manifest.8fbad7db86dc7ee6f23ed3243d015814.js"
 );
 
 self.addEventListener('message', (event) => {

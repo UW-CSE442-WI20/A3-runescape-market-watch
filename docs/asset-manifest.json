@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/A3-runescape-market-watch/static/css/main.33ada554.chunk.css",
-    "main.js": "/A3-runescape-market-watch/static/js/main.db50bab1.chunk.js",
-    "main.js.map": "/A3-runescape-market-watch/static/js/main.db50bab1.chunk.js.map",
+    "main.css": "/A3-runescape-market-watch/static/css/main.d2ff41dc.chunk.css",
+    "main.js": "/A3-runescape-market-watch/static/js/main.16cee7dd.chunk.js",
+    "main.js.map": "/A3-runescape-market-watch/static/js/main.16cee7dd.chunk.js.map",
     "runtime-main.js": "/A3-runescape-market-watch/static/js/runtime-main.dbc3d08f.js",
     "runtime-main.js.map": "/A3-runescape-market-watch/static/js/runtime-main.dbc3d08f.js.map",
     "static/js/2.3fb96fd6.chunk.js": "/A3-runescape-market-watch/static/js/2.3fb96fd6.chunk.js",
     "static/js/2.3fb96fd6.chunk.js.map": "/A3-runescape-market-watch/static/js/2.3fb96fd6.chunk.js.map",
     "index.html": "/A3-runescape-market-watch/index.html",
-    "precache-manifest.bbc45fbe3456fc6417bdda8b532bd81d.js": "/A3-runescape-market-watch/precache-manifest.bbc45fbe3456fc6417bdda8b532bd81d.js",
+    "precache-manifest.8fbad7db86dc7ee6f23ed3243d015814.js": "/A3-runescape-market-watch/precache-manifest.8fbad7db86dc7ee6f23ed3243d015814.js",
     "service-worker.js": "/A3-runescape-market-watch/service-worker.js",
-    "static/css/main.33ada554.chunk.css.map": "/A3-runescape-market-watch/static/css/main.33ada554.chunk.css.map",
+    "static/css/main.d2ff41dc.chunk.css.map": "/A3-runescape-market-watch/static/css/main.d2ff41dc.chunk.css.map",
     "static/js/2.3fb96fd6.chunk.js.LICENSE.txt": "/A3-runescape-market-watch/static/js/2.3fb96fd6.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.dbc3d08f.js",
     "static/js/2.3fb96fd6.chunk.js",
-    "static/css/main.33ada554.chunk.css",
-    "static/js/main.db50bab1.chunk.js"
+    "static/css/main.d2ff41dc.chunk.css",
+    "static/js/main.16cee7dd.chunk.js"
   ]
 }
