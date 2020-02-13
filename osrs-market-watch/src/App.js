@@ -134,6 +134,8 @@ class App extends Component {
 
     const inputStyles = {width: '100%'}
     return (
+      <div>
+      <h1>Runescape Price Data Dashboard</h1>
       <div className="Container">
         <div className="Sidebar">
           <input type="text" className="input" style={inputStyles} placeholder="Search..." onChange={this.filterSidebar} />
@@ -165,6 +167,7 @@ class App extends Component {
           </div>
           
         </div>
+      </div>
       </div>
     );
   }
