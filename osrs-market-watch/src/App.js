@@ -6,6 +6,7 @@ import * as d3 from "d3";
 import ItemMetadata from './data/better_items.json';
 import PriceVolumeChart from './PriceVolumeChart.js';
 
+const TITLE_HEIGHT = 35;
 const SIDEBAR_WIDTH = 250;
 const ITEM_HEADER_HEIGHT = 250;
 
@@ -40,7 +41,7 @@ class App extends Component {
   onResize() {
     this.setState(
       { chartWidth: window.innerWidth - SIDEBAR_WIDTH,
-        chartHeight: window.innerHeight - ITEM_HEADER_HEIGHT});
+        chartHeight: window.innerHeight - ITEM_HEADER_HEIGHT - TITLE_HEIGHT});
   }
 
   csvToJson(csvData) {
@@ -135,15 +136,18 @@ class App extends Component {
     const inputStyles = {width: '100%'}
     return (
       <div>
-      <h1>Runescape Price Data Dashboard</h1>
       <div className="Container">
         <div className="Sidebar">
-          <input type="text" className="input" style={inputStyles} placeholder="Search..." onChange={this.filterSidebar} />
+          <input type="text" className="Searchbar" style={inputStyles} placeholder="Search..." onChange={this.filterSidebar} />
+          <div className="ItemsContainer">
           {
             this.renderSidebar(this.state.filteredItems)
           }
+          </div>
+      
         </div>
         <div className="Content">
+          <div style={{"fontSize": "30px", "textAlign": "center"}}>Runescape Market Watch</div>
           <div className="ItemInfo">
             <img
               className="LargeItemImage"

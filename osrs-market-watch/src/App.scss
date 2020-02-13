@@ -14,6 +14,20 @@ html {
     border: 1px solid black;
     overflow-y: auto;
     overflow-x: hidden;
+    display: grid;
+    grid-template-areas: "search"
+                         "items";
+    grid-template-rows: auto 1fr;
+
+    .Searchbar {
+      grid-area: search;
+      height: 20px;
+    }    
+
+    .ItemsContainer {
+      grid-area: items;
+      overflow-y: auto;
+    }
 
     .SidebarItem {
       display: flex;
@@ -62,7 +76,7 @@ html {
       }
   
       .LargeItemName {
-        font-size: 28px;
+        font-size: 26px;
         grid-area: name;
         color: $text;
       }
