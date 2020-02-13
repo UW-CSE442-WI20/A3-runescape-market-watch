@@ -7,15 +7,14 @@ We started by sketching our designs and then Preston built the project skeleton 
 
 
 #### TODO
-- python scraper, daily pulls and maybe a db, osbuddy data too? (jake/preston)
-- volume / price dual chart with shared X axis (jake)
-- business logic for sidebar / image view, state management (preston)
-- compute % change (day, week, month, etc.) and display with item name (preston)
-  in sidebar
-- sortable sidebar? (maybe a stretch goal) (preston)
-- styles (preston)
-- change units (gp, 100k, 500M, 1.5B, etc...)
-- proper resize... maybe cheat with breakpoints?
+- [ ] python scraper, daily pulls and maybe a db, osbuddy data too? (jake/preston)
+- [x] volume / price dual chart with shared X axis (jake)
+- [x] business logic for sidebar / image view, state management (preston)
+- [ ] compute % change (day, week, month, etc.) and display with item name in sidebar (preston)
+- [ ] sortable sidebar? (maybe a stretch goal) (preston)
+- [x] styles (preston)
+- [x] change units (gp, 100k, 500M, 1.5B, etc...)
+- [x] proper resize... maybe cheat with breakpoints?
 
 
 ### Scraper
