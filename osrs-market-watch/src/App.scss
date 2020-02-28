@@ -10,7 +10,7 @@ html {
 
 .Container {
   display: grid;
-  grid-template-columns: 250px auto;
+  grid-template-columns: 400px auto;
   height: 100vh;
 
   .Sidebar {
@@ -60,8 +60,6 @@ html {
       flex-grow: 1;
       max-height: 100%;
       margin: 50px;
-
-      
     }
 
     .ItemInfo {

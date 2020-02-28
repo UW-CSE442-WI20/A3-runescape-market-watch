@@ -5,10 +5,11 @@ import Papa from "papaparse";
 import * as d3 from "d3";
 import ItemMetadata from './data/better_items.json';
 import PriceVolumeChart from './PriceVolumeChart.js';
+import PriceTable from './components/PriceTable.js';
 
-const TITLE_HEIGHT = 35;
-const SIDEBAR_WIDTH = 250;
-const ITEM_HEADER_HEIGHT = 250;
+const TITLE_HEIGHT = 0;
+const SIDEBAR_WIDTH = 400;
+const ITEM_HEADER_HEIGHT = 0;
 
 class App extends Component {
   constructor(props) {
@@ -22,6 +23,7 @@ class App extends Component {
     this.csvToJson = this.csvToJson.bind(this);
     this.onResize = this.onResize.bind(this);
     this.filterSidebar = this.filterSidebar.bind(this);
+    this.onSidebarSelect = this.onSidebarSelect.bind(this);
   }
 
   // async load the csv file
@@ -100,6 +102,10 @@ class App extends Component {
       );
     });
   }
+
+  onSidebarSelect(id) {
+    this.setState({activeItemId: id})
+  }
   
   filterSidebar(e) {
     const text = e.target.value.toLowerCase();
@@ -149,38 +155,16 @@ class App extends Component {
     const gpFormat = gp => `${d3.format('.3~s')(gp)} gp`;
     const volFormat = d3.format('.3~s');
 
-
-    const inputStyles = {width: '100%'}
     return (
       <div>
       <div className="Container">
-        <div className="Sidebar">
-          <input type="text" className="Searchbar" style={inputStyles} placeholder="Search..." onChange={this.filterSidebar} />
-          <div className="ItemsContainer">
-          {
-            this.renderSidebar(this.state.filteredItems)
-          }
-          </div>
-      
-        </div>
+        <PriceTable
+          items={this.state.filteredItems}
+          metadata={ItemMetadata}
+          filterSidebar={this.filterSidebar}
+          activeItemId={this.state.activeItemId}
+          onSelect={this.onSidebarSelect}/>
         <div className="Content">
-          <div style={{"fontSize": "30px", "textAlign": "center"}}>Runescape Market Watch</div>
-          <div className="ItemInfo">
-            <img
-              className="LargeItemImage"
-              src={metadata.icon}
-              alt={`${metadata.name} thumbnail`}
-            />
-            <h1 className="LargeItemName">{pricedata.name}</h1>
-            <div className="Statistics">
-              <div className="Statistic">{`Daily Price: ${gpFormat(pricedata.daily)}`}</div>
-              <div className="Statistic">{`Daily Volume: ${volFormat(pricedata.volume)}`}</div>
-              <div className="Statistic">{`Avg. Price: ${pricedata.average}`}</div>
-              {/* <div className="Statistic">{`Daily % Change: ${-1}`}</div>
-              <div className="Statistic">{`1 Month % Change: ${-1}`}</div>
-              <div className="Statistic">{`3 Month % Change: ${-1}`}</div> */}
-            </div>
-          </div>
           <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
             <PriceVolumeChart data={chartData}
                               width={chartWidth}
