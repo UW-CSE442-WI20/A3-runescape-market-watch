@@ -110,7 +110,7 @@ class App extends Component {
   filterSidebar(e) {
     const text = e.target.value.toLowerCase();
     const newItems = this.state.sidebarItems.filter(
-      item => item.name.toLowerCase().startsWith(text)
+      item => item.name.toLowerCase().includes(text)
     );
     this.setState({
       filteredItems: newItems

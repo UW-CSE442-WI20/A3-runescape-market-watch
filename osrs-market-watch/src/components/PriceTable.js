@@ -83,6 +83,7 @@ function Table({ data, metadata, onSelect, selected }) {
     () => [
       {
         Header: "Name",
+        accessor: "name",
         Cell: row => {
           return (
             <div>
@@ -90,9 +91,8 @@ function Table({ data, metadata, onSelect, selected }) {
               {row.row.original.name}
             </div>
           );
-        },
-        id: "status"
-      },
+        }      
+    },
     //   {
     //     Header: "Name",
     //     accessor: "name"
@@ -120,7 +120,8 @@ function Table({ data, metadata, onSelect, selected }) {
   } = useTable({
     columns,
     data
-  });
+  },
+    useSortBy);
 
   // Render the UI for your table
 
@@ -130,7 +131,16 @@ function Table({ data, metadata, onSelect, selected }) {
         {headerGroups.map(headerGroup => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render("Header")}
+                  <span>
+                    {column.isSorted
+                      ? column.isSortedDesc
+                        ? ' ↑'
+                        : ' ↓'
+                      : ''}
+                  </span>
+            </th>
             ))}
           </tr>
         ))}
