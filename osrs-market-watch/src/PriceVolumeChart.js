@@ -32,7 +32,7 @@ class PriceVolumeChart extends Component {
     const candleHeight = 0.4 * height;
 
     const TEXT_COLOR = "#111";
-    const GRID_COLOR = "#e7e7e7";
+    const GRID_COLOR = "#000";
 
     const gpFormat = gp => `${d3.format(".3~s")(gp)} gp`;
     const volFormat = d3.format(".3~s");
@@ -66,7 +66,7 @@ class PriceVolumeChart extends Component {
 
     // Gridlines
     const gridlines = d3
-      .axisLeft()
+      .axisRight()
       .tickFormat("")
       .tickSize(-width)
       .scale(yCandleScale);
