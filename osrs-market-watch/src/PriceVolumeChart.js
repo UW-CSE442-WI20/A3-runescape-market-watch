@@ -60,7 +60,6 @@ class PriceVolumeChart extends Component {
 
     const yCandleScale = d3
       .scaleLinear()
-      .rangeRound([height, 0])
       .domain([d3.min(candles, d => d.low), d3.max(candles, d => d.high)])
       .range([candleHeight, 0.1 * candleHeight]);
 
@@ -83,10 +82,10 @@ class PriceVolumeChart extends Component {
       .attr("transform", `translate(${width}, 0)`)
       .call(d3.axisRight(yCandleScale).tickFormat(gpFormat));
 
-    candlestickChart
-      .attr("class", "grid")
-      .style("color", GRID_COLOR)
-      .call(gridlines);
+    // candlestickChart
+    //   .attr("class", "grid")
+    //   .style("color", GRID_COLOR)
+    //   .call(gridlines);
 
     candlestickChart
       .selectAll(".wick")
