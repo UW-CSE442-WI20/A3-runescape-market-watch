@@ -46,7 +46,10 @@ class PriceTable extends Component {
           {this.renderSidebar(this.props.items)}
         </div> */}
         <Styles>
-            <Table data={this.props.items} metadata={this.metadata} />
+            <Table data={this.props.items}
+                   selected={this.props.activeItemId}
+                   metadata={this.metadata}
+                   onSelect={this.props.onSelect} />
         </Styles>
         
       </div>
@@ -58,26 +61,24 @@ const Styles = styled.div`
   padding: 1rem;
 
   table {
+    width: 100%;
 
-    tr {
-      :last-child {
-        td {
-        }
-      }
+    tbody > tr {
+        cursor: pointer;
+            
     }
+    tbody > tr:hover {
+        background: #d2438d !important;
+    }   
 
     th,
     td {
-      margin: 0;
       text-align: left;
-
-      :last-child {
-      }
     }
   }
 `
 
-function Table({ data, metadata }) {
+function Table({ data, metadata, onSelect, selected }) {
   const columns = React.useMemo(
     () => [
       {
@@ -122,6 +123,7 @@ function Table({ data, metadata }) {
   });
 
   // Render the UI for your table
+
   return (
     <table {...getTableProps()}>
       <thead>
@@ -137,7 +139,13 @@ function Table({ data, metadata }) {
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
+            <tr onClick={() => {
+                onSelect(row.original.id)
+                }}
+                style={{
+                    background: row.original.id === selected ? '#00afec' : 'white',
+                    color: row.original.id === selected ? 'white' : 'black'}}
+                {...row.getRowProps()}>
               {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
               })}
