@@ -13,6 +13,10 @@ html {
   grid-template-columns: 400px auto;
   height: 100vh;
 
+  &.Expanded {
+    grid-template-columns: auto;
+  }
+
   .Sidebar {
     border: 1px solid black;
     overflow-y: auto;
@@ -22,10 +26,17 @@ html {
                          "items";
     grid-template-rows: auto 1fr;
 
-    .Searchbar {
+    .SearchBarContainer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      padding: 10px;
+      box-sizing: border-box;
       grid-area: search;
-      height: 20px;
-    }    
+
+      .Searchbar {
+        height: 20px;
+      }  
+    }
 
     .ItemsContainer {
       grid-area: items;
@@ -54,6 +65,10 @@ html {
     flex-direction: column;
     min-width: 100%;
     overflow: hidden;
+
+    &.Expanded {
+      display: none;
+    }
 
     .ChartContainer {
       flex-basis: 0px;

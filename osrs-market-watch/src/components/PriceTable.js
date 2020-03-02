@@ -9,42 +9,19 @@ class PriceTable extends Component {
     this.metadata = props.metadata;
   }
 
-  renderSidebar() {
-    return this.props.items.map((item, i) => {
-      let src = item.id in this.metadata ? this.metadata[item.id].icon : "";
-      let isActive = item.id === this.props.activeItemId;
-      let className = isActive ? "SidebarItem Active" : "SidebarItem";
-
-      return (
-        <div
-          className={className}
-          key={i}
-          onClick={() => this.props.onSelect(item.id)}
-        >
-          <img
-            className="SidebarItemImage"
-            src={src}
-            alt={"MEANINGFUL ALT TEXT"}
-          />
-          <p>{item.name}</p>
-        </div>
-      );
-    });
-  }
-
   render() {
     return (
       <div className="Sidebar">
-        <input
-          type="text"
-          className="Searchbar"
-          style={{ width: "100%" }}
-          placeholder="Search..."
-          onChange={this.props.filterSidebar}
-        />
-        {/* <div className="ItemsContainer">
-          {this.renderSidebar(this.props.items)}
-        </div> */}
+        <div className="SearchBarContainer">
+          <input
+            type="text"
+            className="Searchbar"
+            style={{ width: "100%" }}
+            placeholder="Search..."
+            onChange={this.props.filterSidebar}
+          />
+          <button onClick={this.props.toggleExpand} className="ExpandButton">{`expand`}</button>
+        </div>
         <Styles>
             <Table data={this.props.items}
                    selected={this.props.activeItemId}
@@ -87,29 +64,39 @@ function Table({ data, metadata, onSelect, selected }) {
         Cell: row => {
           return (
             <div>
-              <img height={24} style={{"marginBottom": "-8px"}}src={metadata[row.row.original.id].icon}/>
+              <img 
+                height={24}
+                style={{"marginBottom": "-8px"}}
+                src={metadata[row.row.original.id].icon}/>
               {row.row.original.name}
             </div>
           );
         }      
     },
-    //   {
-    //     Header: "Name",
-    //     accessor: "name"
-    //   },
-
       {
         Header: "Price",
         accessor: "daily"
       },
-
       {
         Header: "Volume",
         accessor: "volume"
-      }
+      },
+      // {
+      //   Header: "Change (1d)",
+      //   accessor: "oneDayChange"
+      // },
+      // {
+      //   Header: "Change (7d)",
+      //   accessor: "oneWeekChange"
+      // },
+      // {
+      //   Header: "Change (1m)",
+      //   accessor: "oneMonthChange"
+      // }
     ],
     []
   );
+  
 
   const {
     getTableProps,
@@ -122,6 +109,8 @@ function Table({ data, metadata, onSelect, selected }) {
     data
   },
     useSortBy);
+
+  console.log(data)
 
   // Render the UI for your table
 

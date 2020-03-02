@@ -17,11 +17,13 @@ class App extends Component {
     this.state = {
       loading: true,
       items: null,
-      activeItemId: null
+      activeItemId: null,
+      expanded: false
     };
     this.chart = React.createRef();
     this.csvToJson = this.csvToJson.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.toggleExpand = this.toggleExpand.bind(this);
     this.filterSidebar = this.filterSidebar.bind(this);
     this.onSidebarSelect = this.onSidebarSelect.bind(this);
   }
@@ -38,6 +40,11 @@ class App extends Component {
     
     window.addEventListener('resize', this.onResize, false);
     this.onResize();
+  }
+
+  toggleExpand() {
+    console.log('shit')
+    this.setState((prev) => ({expanded: !prev.expanded}))
   }
 
   onResize() {
@@ -65,15 +72,23 @@ class App extends Component {
     // or we could query that on item selection
 
     let sidebarItems = [];
+
+    let percentChange = (start, end) => Math.round(1000 * (start - end) / start) / 10;
+
+
     for (var k in itemMap) {
       let mostRecent = itemMap[k].slice(-1)[0];
+      let lastMonth = itemMap[k].slice(-30).map(d => d.daily);
 
       sidebarItems.push({
         name: mostRecent.name,
         average: mostRecent.average,
         daily: mostRecent.daily,
         volume: mostRecent.volume,
-        id: mostRecent.id
+        id: mostRecent.id,
+        oneDayChange: percentChange(lastMonth[28], lastMonth[29]),
+        oneWeekChange: percentChange(lastMonth[22], lastMonth[29]),
+        oneMonthChange: percentChange(lastMonth[0], lastMonth[29])
       });
     }
 
@@ -154,17 +169,20 @@ class App extends Component {
 
     const gpFormat = gp => `${d3.format('.3~s')(gp)} gp`;
     const volFormat = d3.format('.3~s');
+    const { expanded } = this.state;
 
     return (
       <div>
-      <div className="Container">
+      <div className={expanded ? "Container Expanded" : "Container"}>
         <PriceTable
           items={this.state.filteredItems}
           metadata={ItemMetadata}
           filterSidebar={this.filterSidebar}
           activeItemId={this.state.activeItemId}
-          onSelect={this.onSidebarSelect}/>
-        <div className="Content">
+          onSelect={this.onSidebarSelect}
+          expanded={this.state.expanded}
+          toggleExpand={this.toggleExpand}/>
+        <div className={expanded ? "Content Expanded" : "Content"}>
           <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
             <PriceVolumeChart data={chartData}
                               width={chartWidth}
