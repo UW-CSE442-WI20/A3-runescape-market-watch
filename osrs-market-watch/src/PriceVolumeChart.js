@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import * as d3 from "d3";
 
 class PriceVolumeChart extends Component {
+
   constructor(props) {
     super(props);
+    this.manyXAxes = true;
     this.node = React.createRef();
   }
 
@@ -19,74 +21,40 @@ class PriceVolumeChart extends Component {
     return <div ref={this.node} />;
   }
 
-  drawChart() {
-    const { data } = this.props;
-    const margin = { top: 0, right: 100, bottom: 40, left: 50, inner: 40 };
-    const width = Math.max(0, this.props.width - margin.left - margin.right);
-    const height = Math.max(
-      0,
-      this.props.height - margin.top - margin.bottom - 2 * margin.inner
-    );
-    const priceHeight = 0.4 * height;
-    const volumeHeight = 0.2 * height;
-    const candleHeight = 0.4 * height;
+  buildCandlestickChart(chartArea, data, height, chartWidth, margin, yFormatter, xScale) {
+    const chartHeight = this.manyXAxes ? height - margin.top - margin.xbuffer: height - margin.top;
+    const candles = this.getCandles(data);
+    const bandwidth = candles.length > 0 ? (chartWidth / (candles.length + 2)) : 0;
 
-    const TEXT_COLOR = "#111";
-    const GRID_COLOR = "#000";
-
-    const gpFormat = gp => `${d3.format(".3~s")(gp)} gp`;
-    const volFormat = d3.format(".3~s");
-
-    const div = d3.select(this.node.current);
-    div.selectAll("*").remove();
-
-    const xMin = d3.min(data, d => d.ts);
-    const xMax = d3.max(data, d => d.ts);
-    const xScale = d3
-      .scaleTime()
-      .domain([xMin, xMax])
-      .range([0, width]);
-
-    // Build Candlestick Chart ////////////////////////////////////////////////
-    const candles = this.getCandles(data, "Rune scimitar");
-    const bandwidth = candles.length > 0 ? (xScale(xMax) / (candles.length + 1)) : 0;
-
-    const candlestickChart = div
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", candleHeight + margin.top + margin.inner)
+    const candlestickChart = chartArea
       .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+      .attr("width", chartWidth)
+      .attr("height", chartHeight)
+      .attr("transform", `translate(${margin.left}, ${margin.top})`)
 
+    // X-axis
+    if (this.manyXAxes) {
+      candlestickChart
+        .append("g")
+        .attr("id", "xAxis")
+        .attr("transform", `translate(0, ${chartHeight})`)
+        .call( d3.axisBottom(xScale));
+    }
+
+    // Y-axis
     const yCandleScale = d3
       .scaleLinear()
       .domain([d3.min(candles, d => d.low), d3.max(candles, d => d.high)])
-      .range([candleHeight, 0.1 * candleHeight]);
-
-    // Gridlines
-    const gridlines = d3
-      .axisRight()
-      .tickFormat("")
-      .tickSize(-width)
-      .scale(yCandleScale);
-
-    candlestickChart
-      .append("g")
-      .attr("id", "xAxis")
-      .attr("transform", `translate(0, ${candleHeight})`)
-      .call(d3.axisBottom(xScale));
+      .range([chartHeight, 0]);
 
     candlestickChart
       .append("g")
       .attr("id", "yAxis")
-      .attr("transform", `translate(${width}, 0)`)
-      .call(d3.axisRight(yCandleScale).tickFormat(gpFormat));
+      .style("color", "#444")
+      .attr("transform", `translate(${chartWidth}, 0)`)
+      .call(d3.axisRight(yCandleScale).tickFormat(yFormatter));
 
-    // candlestickChart
-    //   .attr("class", "grid")
-    //   .style("color", GRID_COLOR)
-    //   .call(gridlines);
-
+    // Draw wicks
     candlestickChart
       .selectAll(".wick")
       .data(candles)
@@ -95,72 +63,56 @@ class PriceVolumeChart extends Component {
       .attr("class", "wick")
       .style("stroke", d => (d.open > d.close ? "#d66061" : "#60d68a"))
       .attr("x1", d => xScale(d.ts) + bandwidth / 2)
-      .attr("y1", d => yCandleScale(d.high))
       .attr("x2", d => xScale(d.ts) + bandwidth / 2)
-      .attr("y2", d => yCandleScale(d.low));
+      .attr("y1", d => yCandleScale(d.high))
+      .attr("y2", d => yCandleScale(d.low))
 
+    // Draw boxes
     candlestickChart
       .selectAll(".bar")
       .data(candles)
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("x", function(d) {
-        return xScale(d.ts);
-      })
-      .attr("y", function(d) {
-        return yCandleScale(d.open > d.close ? d.open : d.close);
-      })
+      .attr("x", d => xScale(d.ts))
+      .attr("y", d => yCandleScale(Math.max(d.open, d.close)))
       .attr("width", bandwidth)
-      .attr("height", function(d) {
-        let candleTop = Math.max(d.open, d.close);
-        let candleBottom = Math.min(d.open, d.close);
-        return yCandleScale(candleBottom) - yCandleScale(candleTop);
-      })
-      .style("fill", d => (d.open > d.close ? "#d66061" : "#60d68a"));
+      .attr("height", d => Math.abs(yCandleScale(d.open) - yCandleScale(d.close)))
+      .style("fill", d => (d.open > d.close ? "#d66061" : "#60d68a"))
+  }
 
-    // Build Price Chart //////////////////////////////////////////////////////
-    const priceChart = div
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", priceHeight + margin.top + margin.inner)
+  // Construct the price chart in it's area
+  buildPriceChart(chartArea, data, height, chartWidth, margin, yFormatter, xScale) {
+    const chartHeight = this.manyXAxes ? height - margin.xbuffer: height;
+
+    const priceChart = chartArea
       .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+      .attr("width", chartWidth)
+      .attr("height", chartHeight)
+      .attr("transform", `translate(${margin.left}, 0)`)
 
-    priceChart
-      .append("text")
-      .attr("x", width / 2)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("text-decoration", "underline")
-      .text("Price");
+    // X-axis
+    if (this.manyXAxes) {
+      priceChart
+        .append("g")
+        .attr("id", "xAxis")
+        .attr("transform", `translate(0, ${chartHeight})`)
+        .call(d3.axisBottom(xScale));
+    }
 
-    const yPriceMin = Math.min(
-      d3.min(data, d => d.average),
-      d3.min(data, d => d.daily)
-    );
-    const yPriceMax = Math.max(
-      d3.max(data, d => d.average),
-      d3.max(data, d => d.daily)
-    );
-
+    // Y-axis 
+    const yPriceMin = d3.min(data, d => Math.min(d.average, d.daily)) - 5;
+    const yPriceMax = d3.max(data, d => Math.max(d.average, d.daily)) + 5;
     const yPriceScale = d3
       .scaleLinear()
-      .domain([Math.max(0, yPriceMin - 5), yPriceMax + 5])
-      .range([priceHeight, 0.1 * priceHeight]);
-
-    priceChart
-      .append("g")
-      .attr("id", "xAxis")
-      .attr("transform", `translate(0, ${priceHeight})`)
-      .call(d3.axisBottom(xScale));
-
+      .domain([Math.max(0, yPriceMin), yPriceMax])
+      .range([chartHeight, 0]);
+      
     priceChart
       .append("g")
       .attr("id", "yAxis")
-      .attr("transform", `translate(${width}, 0)`)
-      .call(d3.axisRight(yPriceScale).tickFormat(gpFormat));
+      .attr("transform", `translate(${chartWidth}, 0)`)
+      .call(d3.axisRight(yPriceScale).tickFormat(yFormatter));
 
     // generates lines when called
     const dailyLine = d3
@@ -216,53 +168,38 @@ class PriceVolumeChart extends Component {
       .style("stroke", "#67809f")
       .style("stroke-width", "1.5px")
       .style("stroke-dasharray", "3 3");
+  }
 
-    // Build Volume Chart /////////////////////////////////////////////////////
-    const volumeChart = div
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", volumeHeight + margin.bottom + margin.inner)
+  buildVolumeChart(chartArea, data, height, chartWidth, margin, yFormatter, xScale) {
+    const chartHeight = height - margin.xbuffer - margin.bottom;
+    
+    const volumeChart = chartArea
       .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+      .attr("width", chartWidth)
+      .attr("height", chartHeight)
+      .attr("transform", `translate(${margin.left}, 0)`)
 
-    volumeChart
-      .append("text")
-      .attr("x", width / 2)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("text-decoration", "underline")
-      .text("Volume");
-
-    const yVolumeMin = 0;
-    // const yVolumeMin = d3.min(data, d => d.volume);
-    const yVolumeMax = d3.max(data, d => d.volume);
-
-    const yVolumeScale = d3
-      .scaleLinear()
-      .domain([yVolumeMin, yVolumeMax])
-      .range([volumeHeight, 0.1 * volumeHeight]);
-
-    // volumeChart
-    //   .append('rect')
-    //   .attr('class', 'overlay')
-    //   .attr('width', width)
-    //   .attr('height', volumeHeight)
-    //   .style('fill', 'none')
-    //   .style('pointer-events', 'all');
-
+    // X-axis
     volumeChart
       .append("g")
       .attr("id", "xAxis")
-      .attr("transform", `translate(0, ${volumeHeight})`)
+      .attr("transform", `translate(0, ${chartHeight})`)
       .call(d3.axisBottom(xScale));
+
+    // Y-axis
+    const yVolumeScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, d => d.volume)])
+      .range([chartHeight, 0]);
 
     volumeChart
       .append("g")
       .attr("id", "yAxis")
-      .attr("transform", `translate(${width}, 0)`)
-      .call(d3.axisRight(yVolumeScale).tickFormat(volFormat));
+      .attr("transform", `translate(${chartWidth}, 0)`)
+      .call(d3.axisRight(yVolumeScale).tickFormat(yFormatter));
 
+    // Draw bars
+    const bandwidth = data.length > 0 ? (chartWidth / (data.length + 2)) : 0;
     const volData = data.filter(d => d.volume != null);
     volumeChart
       .selectAll()
@@ -274,97 +211,165 @@ class PriceVolumeChart extends Component {
       .attr("y", d => yVolumeScale(d.volume))
       .attr("class", "vol")
       .attr("fill", "steelblue")
-      .attr("width", 4)
-      .attr("height", d => volumeHeight - yVolumeScale(d.volume));
+      .attr("width", bandwidth)
+      .attr("height", d => chartHeight - yVolumeScale(d.volume));
+  }
 
-    div
+  drawChart() {
+    const { data } = this.props;
+    const margin = { top: 20, right: 60, left: 20, bottom: 20, xbuffer: 20 };
+    const height = Math.max(0, this.props.height);
+    const width = Math.max(0, this.props.width);
+    const candleHeight = 0.4 * height;
+    const priceHeight = 0.4 * height;
+    const volumeHeight = 0.2 * height;
+
+    const TEXT_COLOR = "#111";
+    const GRID_COLOR = "#444";
+
+    var gpFormat = gp => `${d3.format(".3~s")(gp)} gp`;
+    var volFormat = d3.format(".3~s");
+
+    const div = d3.select(this.node.current);
+    div.selectAll("*").remove();
+    
+    const svg = div
+      .append("svg")
+      .attr("width", this.props.width)
+      .attr("height", this.props.height)
+      
+    const candlestickArea = svg
+      .append("g")
+      .attr("class", "candlestick")
+      .attr("width", this.props.width)
+      .attr("height", candleHeight);
+      
+    const priceArea = svg
+      .append("g")
+      .attr("class", "price")
+      .attr("width", this.props.width)
+      .attr("height", priceHeight)
+      .attr("transform", `translate(0, ${candleHeight})`);
+      
+    const volumeArea = svg
+      .append("g")
+      .attr("class", "volume")
+      .attr("width", this.props.width)
+      .attr("height", volumeHeight)
+      .attr("transform", `translate(0, ${candleHeight + priceHeight})`);
+
+    const chartWidth = width - margin.left - margin.right
+    const xMin = d3.min(data, d => d.ts);
+    const xMax = d3.max(data, d => d.ts);
+    const xScale = d3
+      .scaleTime()
+      .domain([xMin, xMax])
+      .range([0, chartWidth]);
+
+    this.buildCandlestickChart(candlestickArea, data, candleHeight, chartWidth, margin, gpFormat, xScale);
+    this.buildPriceChart(priceArea, data, priceHeight, chartWidth, margin, gpFormat, xScale);
+    this.buildVolumeChart(volumeArea, data, volumeHeight, chartWidth, margin, volFormat, xScale);
+
+    // CROSSHAIR ////////////////////////////////////////////////////////////// 
+    svg
+      .append("line")
+      .classed("x", true)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .style("stroke", "#67809f")
+      .style("stroke-width", "1.5px")
+      .style("stroke-dasharray", "3 3");
+
+    svg
       .on("mousemove", generateCrosshair)
-      .on("mouseover", () => priceFocus.style("display", null))
-      .on("mouseout", () => {
-        priceFocus.style("display", "none");
-        volumeChart.selectAll("rect").attr("fill", "steelblue");
-      });
+      // .on("mouseover", () => priceFocus.style("display", null))
+      // .on("mouseout", () => {
+      //   priceFocus.style("display", "none");
+      //   volumeChart.selectAll("rect").attr("fill", "steelblue");
+      // });
 
     const bisectDate = d3.bisector(d => d.ts).left;
-
     function generateCrosshair() {
       const date = xScale.invert(d3.mouse(this)[0] - margin.left);
       const i = bisectDate(data, date, 1, data.length - 1);
       const d0 = data[i - 1];
       const d1 = data[i];
-      const currData = date - d0.ts > d1.ts - date ? d1 : d0;
-
-      priceFocus
-        .select("circle.daily")
-        .attr(
-          "transform",
-          `translate(${xScale(currData.ts)}, ${yPriceScale(currData.daily)})`
-        );
-
-      priceFocus
-        .select("circle.average")
-        .attr(
-          "transform",
-          `translate(${xScale(currData.ts)}, ${yPriceScale(currData.average)})`
-        );
-
-      priceFocus
-        .select("line.y")
+      const currData = (date - d0.ts) > (d1.ts - date) ? d1 : d0;
+      const currX = xScale(currData.ts)
+      svg
+        .select("line.x")
         .attr("x1", 0)
         .attr("x2", 0)
-        .attr("y1", 10)
-        .attr("y2", priceHeight)
-        .attr("transform", `translate(${xScale(currData.ts)}, 0)`);
-
-      priceFocus.selectAll("text").remove();
-
-      // priceFocus
-      //   .append('text')
-      //   .attr('fill', 'black')
-      //   .attr(
-      //     'transform',
-      //     `translate(${xScale(currData.ts)}, 0)`
-      //   )
-      //   .text(`${currData.ts.toLocaleString('en-US', options)}`);
-
-      volumeChart.selectAll("rect").attr("fill", "steelblue");
-
-      volumeChart.select(`rect#vol_${i}`).attr("fill", "darkblue");
-      updateLegends(currData);
+        .attr("y1", 0)
+        .attr("y2", height)
+        .attr("transform", `translate(${margin.left + currX}, 0)`);
     }
 
-    /* Legends */
-    const updateLegends = currentData => {
-      d3.selectAll(".lineLegend").remove();
+    // OLD CROSS HAIR
+    // function generateCrosshair() {
+    //   const date = xScale.invert(d3.mouse(this)[0] - margin.left);
+    //   const i = bisectDate(data, date, 1, data.length - 1);
+    //   const d0 = data[i - 1];
+    //   const d1 = data[i];
+    //   const currData = date - d0.ts > d1.ts - date ? d1 : d0;
+    //   const currTs = xScale(currData.ts)
 
-      const legendKeys = Object.keys(data[0]);
-      const lineLegend = priceChart
-        .selectAll(".lineLegend")
-        .data(legendKeys)
-        .enter()
-        .append("g")
-        .attr("class", "lineLegend")
-        .attr("transform", (_, i) => `translate(0, ${i * 20})`);
+    //   priceFocus
+    //     .select("circle.daily")
+    //     .attr(
+    //       "transform",
+    //       `translate(${currTs}, ${yPriceScale(currData.daily)})`
+    //     );
 
-      lineLegend
-        .append("text")
-        .style("fill", "black")
-        .attr("transform", "translate(15,15)")
-        .text(d => {
-          if (d === "ts") {
-            const options = { year: "numeric", month: "long", day: "numeric" };
-            return currentData[d].toLocaleDateString("en-US", options);
-          } else if (d === "daily") {
-            return `Price:   ${gpFormat(currentData[d])}`;
-          } else if (d === "average") {
-            return `Average: ${gpFormat(currentData[d])}`;
-          } else if (d === "volume") {
-            return `Volume traded: ${volFormat(currentData[d])}`;
-          } else {
-            return;
-          }
-        });
-    };
+    //   priceFocus
+    //     .select("circle.average")
+    //     .attr(
+    //       "transform",
+    //       `translate(${currTs}, ${yPriceScale(currData.average)})`
+    //     );
+
+    //   priceFocus
+    //     .select("line.y")
+    //     .attr("x1", 0)
+    //     .attr("x2", 0)
+    //     .attr("y1", 10)
+    //     .attr("y2", priceHeight)
+    //     .attr("transform", `translate(${currTs}, 0)`);
+
+    //   priceFocus.selectAll("text").remove();
+
+    //   volumeChart.selectAll("rect").attr("fill", "steelblue");
+    //   volumeChart.select(`rect#vol_${i}`).attr("fill", "darkblue");
+    //   d3.selectAll(".lineLegend").remove();
+
+    //   const legendKeys = Object.keys(data[0]);
+    //   const lineLegend = priceChart
+    //     .selectAll(".lineLegend")
+    //     .data(legendKeys)
+    //     .enter()
+    //     .append("g")
+    //     .attr("class", "lineLegend")
+    //     .attr("transform", (_, i) => `translate(0, ${i * 20})`);
+
+    //   lineLegend
+    //     .append("text")
+    //     .style("fill", "black")
+    //     .attr("transform", "translate(15,15)")
+    //     .text(d => {
+    //       if (d === "ts") {
+    //         const options = { year: "numeric", month: "long", day: "numeric" };
+    //         return currData[d].toLocaleDateString("en-US", options);
+    //       } else if (d === "daily") {
+    //         return `Price:   ${gpFormat(currData[d])}`;
+    //       } else if (d === "average") {
+    //         return `Average: ${gpFormat(currData[d])}`;
+    //       } else if (d === "volume") {
+    //         return `Volume traded: ${volFormat(currData[d])}`;
+    //       } else {
+    //         return;
+    //       }
+    //     });
+    // }
   }
 
   getCandles(data) {
