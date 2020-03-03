@@ -66,6 +66,7 @@ class PriceTable extends Component {
             onSelect={this.props.onSelect}
             formatGp={this.props.formatGp}
             pgSize={Math.round(TABLE_HEIGHT/TABLE_ROW_HEIGHT)}
+            expanded={this.props.expanded}
           />
         </ThemeProvider>
       </div>
@@ -73,55 +74,69 @@ class PriceTable extends Component {
   }
 }
 
-function Table({ data, metadata, onSelect, selected, formatGp, pgSize }) {
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "Name",
-        accessor: "name",
-        Cell: row => {
-          return (
-            <div>
-              <img
-                height={24}
-                style={{ marginBottom: "-8px" }}
-                src={metadata[row.row.original.id].icon}
-              />
-              {row.row.original.name}
-            </div>
-          );
-        }
-      },
-      {
-        Header: "Price",
-        accessor: "daily",
+function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded }) {
+
+  let formatCell = (val) => {
+    let color;
+    if (val < 0) {
+      color = RED;
+    } else if (val > 0) {
+      color = GREEN;
+    } else {
+      color = "#fff";
+    }
+    return <span style={{"color" : color}}>{formatGp(val)}</span>;
+  }
+  let basicColumns = [
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: row => {
+        return (
+          <div>
+            <img
+              height={24}
+              style={{ marginBottom: "-8px" }}
+              src={metadata[row.row.original.id].icon}
+            />
+            {row.row.original.name}
+          </div>
+        );
+      }
+    },
+    {
+      Header: "Price",
+      accessor: "daily",
       Cell: row => {
       let color = row.row.original.oneDayChange > 0 ? GREEN : RED;
       return <span style={{"color" : color}}>{formatGp(row.row.original.daily)}</span>;
-      }
+    }
+    },
+    {
+      Header: "Volume",
+      accessor: "volume",
+      Cell: row => formatGp(row.row.original.volume)
+    }
+  ];
+
+  let expandedColumns = [
+    {
+        Header: "Change (1d)",
+        accessor: "oneDayChange"
       },
       {
-        Header: "Volume",
-        accessor: "volume",
-        Cell: row => formatGp(row.row.original.volume)
+        Header: "Change (7d)",
+        accessor: "oneWeekChange"
       },
-      // {
-      //   Header: "Change (1d)",
-      //   accessor: "oneDayChange",
-      //   show: false
-      // },
-      // {
-      //   Header: "Change (7d)",
-      //   accessor: "oneWeekChange",
-      //   show: false
-      // },
-      // {
-      //   Header: "Change (1m)",
-      //   accessor: "oneMonthChange",
-      //   show: false
-      // }
-    ],
-    []
+      {
+        Header: "Change (1m)",
+        accessor: "oneMonthChange"
+      }
+  ]
+
+  const columns = React.useMemo(
+    () => expanded ? basicColumns.concat(expandedColumns) : basicColumns,
+    [expanded, basicColumns, expandedColumns]
   );
 
   const {
