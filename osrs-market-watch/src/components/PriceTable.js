@@ -76,7 +76,7 @@ class PriceTable extends Component {
 
 function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded }) {
 
-  let formatCell = (val) => {
+  let formatPercentChange = (val) => {
     let color;
     if (val < 0) {
       color = RED;
@@ -85,7 +85,7 @@ function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded 
     } else {
       color = "#fff";
     }
-    return <span style={{"color" : color}}>{formatGp(val)}</span>;
+    return <span style={{"color" : color}}>{`${val}%`}</span>;
   }
   let basicColumns = [
     {
@@ -122,15 +122,18 @@ function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded 
   let expandedColumns = [
     {
         Header: "Change (1d)",
-        accessor: "oneDayChange"
+        accessor: "oneDayChange",
+        Cell: row => formatPercentChange(row.row.original.oneDayChange)
       },
       {
         Header: "Change (7d)",
-        accessor: "oneWeekChange"
+        accessor: "oneWeekChange",
+        Cell: row => formatPercentChange(row.row.original.oneWeekChange)
       },
       {
         Header: "Change (1m)",
-        accessor: "oneMonthChange"
+        accessor: "oneMonthChange",
+        Cell: row => formatPercentChange(row.row.original.oneMonthChange)
       }
   ]
 
