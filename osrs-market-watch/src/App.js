@@ -169,27 +169,27 @@ class App extends Component {
     const { expanded } = this.state;
 
     return (
-      <div>
-      <div className={expanded ? "Container Expanded" : "Container"}>
-        <PriceTable
-          items={this.state.filteredItems}
-          metadata={ItemMetadata}
-          filterSidebar={this.filterSidebar}
-          activeItemId={this.state.activeItemId}
-          onSelect={this.onSidebarSelect}
-          expanded={this.state.expanded}
-          toggleExpand={this.toggleExpand}
-          formatGp={volFormat}
-          height={chartHeight}/>
-        <div className={expanded ? "Content Expanded" : "Content"}>
-          <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
-            <PriceVolumeChart data={chartData}
-                              width={chartWidth}
-                              height={chartHeight} />
+      <div className="Wrapper">
+        <div className={expanded ? "Container Expanded" : "Container"}>
+          <PriceTable
+            items={this.state.filteredItems}
+            metadata={ItemMetadata}
+            filterSidebar={this.filterSidebar}
+            activeItemId={this.state.activeItemId}
+            onSelect={this.onSidebarSelect}
+            expanded={this.state.expanded}
+            toggleExpand={this.toggleExpand}
+            formatGp={volFormat}
+            height={chartHeight}/>
+          <div className={expanded ? "Content Expanded" : "Content"}>
+            <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
+              <PriceVolumeChart data={chartData}
+                                width={chartWidth}
+                                height={chartHeight} />
+            </div>
+            
           </div>
-          
         </div>
-      </div>
       </div>
     );
   }

@@ -13,7 +13,9 @@ import { createMuiTheme } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import { Input, Button } from '@material-ui/core';
 
-const RED = "#8a3535";
+const PRIMARY = "#212121";
+const RED = "#d66061";
+const GREEN = "#60d68a";
 const BG = "#303030";
 
 class PriceTable extends Component {
@@ -30,13 +32,17 @@ class PriceTable extends Component {
 
   render() {
 
-    // subtract search bar, header, and footer heights...
-    const TABLE_HEIGHT = this.props.height - 56 - 56 - 36;
+    // subtract search bar, header, header, and footer heights...
+    const TABLE_HEIGHT = this.props.height - 56 - 56 - 36 - 34;
     const TABLE_ROW_HEIGHT = 54;
 
     return (
       <div className="Sidebar">
         <ThemeProvider theme={this.theme}>
+          <div className="Header">
+            <img src={'./coins.png'} className="HeaderImage"/>
+            <div className="Logo">OSRS Watch</div>
+          </div>
         <div className="SearchBarContainer">
           <Input
             type="text"
@@ -89,7 +95,10 @@ function Table({ data, metadata, onSelect, selected, formatGp, pgSize }) {
       {
         Header: "Price",
         accessor: "daily",
-        Cell: row => formatGp(row.row.original.daily)
+      Cell: row => {
+      let color = row.row.original.oneDayChange > 0 ? GREEN : RED;
+      return <span style={{"color" : color}}>{formatGp(row.row.original.daily)}</span>;
+      }
       },
       {
         Header: "Volume",
@@ -123,7 +132,7 @@ function Table({ data, metadata, onSelect, selected, formatGp, pgSize }) {
     prepareRow,
     pageOptions,
     page,
-    state: { pageIndex },
+    state: { pageIndex},
     previousPage,
     nextPage,
     canPreviousPage,
