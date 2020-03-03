@@ -178,7 +178,9 @@ class App extends Component {
           activeItemId={this.state.activeItemId}
           onSelect={this.onSidebarSelect}
           expanded={this.state.expanded}
-          toggleExpand={this.toggleExpand}/>
+          toggleExpand={this.toggleExpand}
+          formatGp={volFormat}
+          height={chartHeight}/>
         <div className={expanded ? "Content Expanded" : "Content"}>
           <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
             <PriceVolumeChart data={chartData}

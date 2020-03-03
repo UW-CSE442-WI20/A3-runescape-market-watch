@@ -52,7 +52,6 @@ class PriceVolumeChart extends Component {
     candlestickChart
       .append("g")
       .attr("id", "yAxis")
-      .style("color", "#444")
       .attr("transform", `translate(${chartWidth}, 0)`)
       .call(d3.axisRight(yCandleScale).tickFormat(yFormatter));
 

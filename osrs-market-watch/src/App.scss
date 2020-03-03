@@ -32,9 +32,23 @@ html {
     height: 100%;
     display: grid;
     grid-template-areas: "search"
-                         "items";
-    grid-template-rows: auto 1fr;
+                         "items"
+                         "footer";
+    grid-template-rows: auto 1fr auto;
 
+    .Footer {
+      grid-area: footer;
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+
+      & > * {
+        flex-grow: 1;
+        text-align: center;
+        padding: 4px;
+        font-size: 16px;
+      }
+    }
     .SearchBarContainer {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -50,7 +64,7 @@ html {
 
     .ItemsContainer {
       grid-area: items;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     .SidebarItem {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "../App.scss";
-import { useTable, useSortBy } from "react-table";
+import { useTable, useSortBy, usePagination } from "react-table";
 import styled from "styled-components";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -20,28 +20,31 @@ class PriceTable extends Component {
   constructor(props) {
     super(props);
     this.metadata = props.metadata;
-  }
-
-  render() {
-    const theme = createMuiTheme({
+    this.theme = createMuiTheme({
       palette: {
         primary: {500: RED},
         type: "dark"
       }
     });
+  }
+
+  render() {
+
+    // subtract search bar, header, and footer heights...
+    const TABLE_HEIGHT = this.props.height - 56 - 56 - 36;
+    const TABLE_ROW_HEIGHT = 54;
 
     return (
       <div className="Sidebar">
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={this.theme}>
         <div className="SearchBarContainer">
           <Input
             type="text"
             className="Searchbar"
             style={{ width: "100%" }}
             placeholder="Search..."
-            onChange={this.props.filterSidebar}
-            color={RED}
-          />
+            onChange={this.props.filterSidebar}>
+            </Input>
           <Button
             onClick={this.props.toggleExpand}
             className="ExpandButton">
@@ -55,6 +58,8 @@ class PriceTable extends Component {
             selected={this.props.activeItemId}
             metadata={this.metadata}
             onSelect={this.props.onSelect}
+            formatGp={this.props.formatGp}
+            pgSize={Math.round(TABLE_HEIGHT/TABLE_ROW_HEIGHT)}
           />
         </ThemeProvider>
       </div>
@@ -62,7 +67,7 @@ class PriceTable extends Component {
   }
 }
 
-function Table({ data, metadata, onSelect, selected }) {
+function Table({ data, metadata, onSelect, selected, formatGp, pgSize }) {
   const columns = React.useMemo(
     () => [
       {
@@ -83,23 +88,28 @@ function Table({ data, metadata, onSelect, selected }) {
       },
       {
         Header: "Price",
-        accessor: "daily"
+        accessor: "daily",
+        Cell: row => formatGp(row.row.original.daily)
       },
       {
         Header: "Volume",
-        accessor: "volume"
-      }
+        accessor: "volume",
+        Cell: row => formatGp(row.row.original.volume)
+      },
       // {
       //   Header: "Change (1d)",
-      //   accessor: "oneDayChange"
+      //   accessor: "oneDayChange",
+      //   show: false
       // },
       // {
       //   Header: "Change (7d)",
-      //   accessor: "oneWeekChange"
+      //   accessor: "oneWeekChange",
+      //   show: false
       // },
       // {
       //   Header: "Change (1m)",
-      //   accessor: "oneMonthChange"
+      //   accessor: "oneMonthChange",
+      //   show: false
       // }
     ],
     []
@@ -110,18 +120,27 @@ function Table({ data, metadata, onSelect, selected }) {
     getTableBodyProps,
     headerGroups,
     rows,
-    prepareRow
+    prepareRow,
+    pageOptions,
+    page,
+    state: { pageIndex },
+    previousPage,
+    nextPage,
+    canPreviousPage,
+    canNextPage,
   } = useTable(
     {
       columns,
-      data
+      data,
+      initialState: { pageIndex: 0, pageSize: pgSize}
     },
-    useSortBy
+    useSortBy,
+    usePagination
   );
 
   // Render the UI for your table
-
   return (
+    <>
     <MaUTable {...getTableProps()}>
       <TableHead>
         {headerGroups.map(headerGroup => (
@@ -140,7 +159,7 @@ function Table({ data, metadata, onSelect, selected }) {
         ))}
       </TableHead>
       <TableBody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
+        {page.map((row, i) => {
           prepareRow(row);
           return (
             <TableRow
@@ -148,7 +167,6 @@ function Table({ data, metadata, onSelect, selected }) {
               onClick={() => {
                 onSelect(row.original.id);
               }}
-              // style={{ background: row.original.id === selected ? RED : BG }}
               {...row.getRowProps()}
             >
               {row.cells.map(cell => {
@@ -163,6 +181,23 @@ function Table({ data, metadata, onSelect, selected }) {
         })}
       </TableBody>
     </MaUTable>
+    <div className="Footer">
+      <Button onClick={() => previousPage()} disabled={!canPreviousPage}>
+        Prev
+      </Button>
+      <div>
+        Page{' '}
+        <em>
+          {pageIndex + 1} of {pageOptions.length}
+        </em>
+      </div>
+      <Button onClick={() => nextPage()} disabled={!canNextPage}>
+        Next
+      </Button>
+
+
+    </div>
+    </>
   );
 }
 
