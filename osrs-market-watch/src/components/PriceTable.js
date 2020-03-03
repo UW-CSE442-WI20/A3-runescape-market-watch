@@ -25,6 +25,7 @@ class PriceTable extends Component {
   render() {
     const theme = createMuiTheme({
       palette: {
+        primary: {500: RED},
         type: "dark"
       }
     });
@@ -39,6 +40,7 @@ class PriceTable extends Component {
             style={{ width: "100%" }}
             placeholder="Search..."
             onChange={this.props.filterSidebar}
+            color={RED}
           />
           <Button
             onClick={this.props.toggleExpand}
@@ -59,26 +61,6 @@ class PriceTable extends Component {
     );
   }
 }
-
-const Styles = styled.div`
-  padding: 1rem;
-
-  table {
-    width: 100%;
-
-    tbody > tr {
-      cursor: pointer;
-    }
-    tbody > tr:hover {
-      background: #d2438d !important;
-    }
-
-    th,
-    td {
-      text-align: left;
-    }
-  }
-`;
 
 function Table({ data, metadata, onSelect, selected }) {
   const columns = React.useMemo(

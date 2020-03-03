@@ -29,8 +29,7 @@ html {
 
   .Sidebar {
     border: 1px solid black;
-    overflow-y: auto;
-    overflow-x: hidden;
+    height: 100%;
     display: grid;
     grid-template-areas: "search"
                          "items";
@@ -44,7 +43,8 @@ html {
       grid-area: search;
 
       .Searchbar {
-        height: 20px;
+        height: 100%;
+
       }  
     }
 
