@@ -7,8 +7,10 @@ class PriceVolumeChart extends Component {
     this.node = React.createRef();
   }
 
-  componentDidUpdate() {
-    this.drawChart();
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps !== this.props) {
+      this.drawChart();
+    }
   }
 
   componentDidMount() {
@@ -20,6 +22,7 @@ class PriceVolumeChart extends Component {
   }
 
   drawChart() {
+    console.log("DRAWING CHART")
     const { data } = this.props;
     const margin = { top: 0, right: 100, bottom: 40, left: 50, inner: 40 };
     const width = Math.max(0, this.props.width - margin.left - margin.right);

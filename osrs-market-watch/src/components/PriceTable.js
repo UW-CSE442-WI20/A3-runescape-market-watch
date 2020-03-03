@@ -1,7 +1,20 @@
 import React, { Component } from "react";
 import "../App.scss";
 import { useTable, useSortBy } from "react-table";
-import styled from 'styled-components';
+import styled from "styled-components";
+
+import CssBaseline from "@material-ui/core/CssBaseline";
+import MaUTable from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import { createMuiTheme } from "@material-ui/core";
+import { ThemeProvider } from "@material-ui/styles";
+import { Input, Button } from '@material-ui/core';
+
+const RED = "#8a3535";
+const BG = "#303030";
 
 class PriceTable extends Component {
   constructor(props) {
@@ -10,25 +23,38 @@ class PriceTable extends Component {
   }
 
   render() {
+    const theme = createMuiTheme({
+      palette: {
+        type: "dark"
+      }
+    });
+
     return (
       <div className="Sidebar">
+        <ThemeProvider theme={theme}>
         <div className="SearchBarContainer">
-          <input
+          <Input
             type="text"
             className="Searchbar"
             style={{ width: "100%" }}
             placeholder="Search..."
             onChange={this.props.filterSidebar}
           />
-          <button onClick={this.props.toggleExpand} className="ExpandButton">{`expand`}</button>
+          <Button
+            onClick={this.props.toggleExpand}
+            className="ExpandButton">
+              {this.props.expanded ? '<<' : '>>'}
+          </Button>
         </div>
-        <Styles>
-            <Table data={this.props.items}
-                   selected={this.props.activeItemId}
-                   metadata={this.metadata}
-                   onSelect={this.props.onSelect} />
-        </Styles>
-        
+          <CssBaseline />
+
+          <Table
+            data={this.props.items}
+            selected={this.props.activeItemId}
+            metadata={this.metadata}
+            onSelect={this.props.onSelect}
+          />
+        </ThemeProvider>
       </div>
     );
   }
@@ -41,19 +67,18 @@ const Styles = styled.div`
     width: 100%;
 
     tbody > tr {
-        cursor: pointer;
-            
+      cursor: pointer;
     }
     tbody > tr:hover {
-        background: #d2438d !important;
-    }   
+      background: #d2438d !important;
+    }
 
     th,
     td {
       text-align: left;
     }
   }
-`
+`;
 
 function Table({ data, metadata, onSelect, selected }) {
   const columns = React.useMemo(
@@ -64,15 +89,16 @@ function Table({ data, metadata, onSelect, selected }) {
         Cell: row => {
           return (
             <div>
-              <img 
+              <img
                 height={24}
-                style={{"marginBottom": "-8px"}}
-                src={metadata[row.row.original.id].icon}/>
+                style={{ marginBottom: "-8px" }}
+                src={metadata[row.row.original.id].icon}
+              />
               {row.row.original.name}
             </div>
           );
-        }      
-    },
+        }
+      },
       {
         Header: "Price",
         accessor: "daily"
@@ -80,7 +106,7 @@ function Table({ data, metadata, onSelect, selected }) {
       {
         Header: "Volume",
         accessor: "volume"
-      },
+      }
       // {
       //   Header: "Change (1d)",
       //   accessor: "oneDayChange"
@@ -96,7 +122,6 @@ function Table({ data, metadata, onSelect, selected }) {
     ],
     []
   );
-  
 
   const {
     getTableProps,
@@ -104,55 +129,58 @@ function Table({ data, metadata, onSelect, selected }) {
     headerGroups,
     rows,
     prepareRow
-  } = useTable({
-    columns,
-    data
-  },
-    useSortBy);
-
-  console.log(data)
+  } = useTable(
+    {
+      columns,
+      data
+    },
+    useSortBy
+  );
 
   // Render the UI for your table
 
   return (
-    <table {...getTableProps()}>
-      <thead>
+    <MaUTable {...getTableProps()}>
+      <TableHead>
         {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
+          <TableRow {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render("Header")}
-                  <span>
-                    {column.isSorted
-                      ? column.isSortedDesc
-                        ? ' ↑'
-                        : ' ↓'
-                      : ''}
-                  </span>
-            </th>
+              <TableCell
+                {...column.getHeaderProps(column.getSortByToggleProps())}
+              >
+                {column.render("Header")}
+                <span>
+                  {column.isSorted ? (column.isSortedDesc ? " ↑" : " ↓") : ""}
+                </span>
+              </TableCell>
             ))}
-          </tr>
+          </TableRow>
         ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
+      </TableHead>
+      <TableBody {...getTableBodyProps()}>
         {rows.map((row, i) => {
           prepareRow(row);
           return (
-            <tr onClick={() => {
-                onSelect(row.original.id)
-                }}
-                style={{
-                    background: row.original.id === selected ? '#00afec' : 'white',
-                    color: row.original.id === selected ? 'white' : 'black'}}
-                {...row.getRowProps()}>
+            <TableRow
+              className={row.original.id === selected ? "PriceTableRow Selected" : "PriceTableRow" }
+              onClick={() => {
+                onSelect(row.original.id);
+              }}
+              // style={{ background: row.original.id === selected ? RED : BG }}
+              {...row.getRowProps()}
+            >
               {row.cells.map(cell => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                return (
+                  <TableCell {...cell.getCellProps()}>
+                    {cell.render("Cell")}
+                  </TableCell>
+                );
               })}
-            </tr>
+            </TableRow>
           );
         })}
-      </tbody>
-    </table>
+      </TableBody>
+    </MaUTable>
   );
 }
 

@@ -1,13 +1,23 @@
 @import "loading";
 
-$bg: #e7e7e7;
+$bg: #303030;
 $text: #222;
+$red: #8a3535;
 
 html {
   background: $bg;
   overflow: hidden;
 }
 
+.PriceTableRow {
+  &:hover {
+    background: #474444 !important;
+  }
+
+  &.Selected {
+    background: $red !important;
+  }
+}
 .Container {
   display: grid;
   grid-template-columns: 400px auto;

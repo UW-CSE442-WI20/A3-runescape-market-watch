@@ -43,7 +43,6 @@ class App extends Component {
   }
 
   toggleExpand() {
-    console.log('shit')
     this.setState((prev) => ({expanded: !prev.expanded}))
   }
 
@@ -91,8 +90,6 @@ class App extends Component {
         oneMonthChange: percentChange(lastMonth[0], lastMonth[29])
       });
     }
-
-    console.log(sidebarItems[0].name);
 
     this.setState({
       loading: false,
