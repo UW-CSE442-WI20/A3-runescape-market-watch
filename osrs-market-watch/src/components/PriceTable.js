@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import "../App.scss";
-import { useTable, useSortBy } from "react-table";
+import { useTable, useSortBy, usePagination } from "react-table";
 import styled from "styled-components";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,33 +13,44 @@ import { createMuiTheme } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import { Input, Button } from '@material-ui/core';
 
-const RED = "#8a3535";
+const PRIMARY = "#212121";
+const RED = "#d66061";
+const GREEN = "#60d68a";
 const BG = "#303030";
 
 class PriceTable extends Component {
   constructor(props) {
     super(props);
     this.metadata = props.metadata;
-  }
-
-  render() {
-    const theme = createMuiTheme({
+    this.theme = createMuiTheme({
       palette: {
+        primary: {500: RED},
         type: "dark"
       }
     });
+  }
+
+  render() {
+
+    // subtract search bar, header, header, and footer heights...
+    const TABLE_HEIGHT = this.props.height - 56 - 56 - 36 - 34;
+    const TABLE_ROW_HEIGHT = 54;
 
     return (
       <div className="Sidebar">
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={this.theme}>
+          <div className="Header">
+            <img src={'./coins.png'} className="HeaderImage"/>
+            <div className="Logo">OSRS Watch</div>
+          </div>
         <div className="SearchBarContainer">
           <Input
             type="text"
             className="Searchbar"
             style={{ width: "100%" }}
             placeholder="Search..."
-            onChange={this.props.filterSidebar}
-          />
+            onChange={this.props.filterSidebar}>
+            </Input>
           <Button
             onClick={this.props.toggleExpand}
             className="ExpandButton">
@@ -53,6 +64,9 @@ class PriceTable extends Component {
             selected={this.props.activeItemId}
             metadata={this.metadata}
             onSelect={this.props.onSelect}
+            formatGp={this.props.formatGp}
+            pgSize={Math.round(TABLE_HEIGHT/TABLE_ROW_HEIGHT)}
+            expanded={this.props.expanded}
           />
         </ThemeProvider>
       </div>
@@ -60,67 +74,72 @@ class PriceTable extends Component {
   }
 }
 
-const Styles = styled.div`
-  padding: 1rem;
+function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded }) {
 
-  table {
-    width: 100%;
-
-    tbody > tr {
-      cursor: pointer;
+  let formatPercentChange = (val) => {
+    let color;
+    if (val < 0) {
+      color = RED;
+    } else if (val > 0) {
+      color = GREEN;
+    } else {
+      color = "#fff";
     }
-    tbody > tr:hover {
-      background: #d2438d !important;
-    }
-
-    th,
-    td {
-      text-align: left;
-    }
+    return <span style={{"color" : color}}>{`${val}%`}</span>;
   }
-`;
-
-function Table({ data, metadata, onSelect, selected }) {
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "Name",
-        accessor: "name",
-        Cell: row => {
-          return (
-            <div>
-              <img
-                height={24}
-                style={{ marginBottom: "-8px" }}
-                src={metadata[row.row.original.id].icon}
-              />
-              {row.row.original.name}
-            </div>
-          );
-        }
-      },
-      {
-        Header: "Price",
-        accessor: "daily"
-      },
-      {
-        Header: "Volume",
-        accessor: "volume"
+  let basicColumns = [
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: row => {
+        return (
+          <div>
+            <img
+              height={24}
+              style={{ marginBottom: "-8px" }}
+              src={metadata[row.row.original.id].icon}
+            />
+            {row.row.original.name}
+          </div>
+        );
       }
-      // {
-      //   Header: "Change (1d)",
-      //   accessor: "oneDayChange"
-      // },
-      // {
-      //   Header: "Change (7d)",
-      //   accessor: "oneWeekChange"
-      // },
-      // {
-      //   Header: "Change (1m)",
-      //   accessor: "oneMonthChange"
-      // }
-    ],
-    []
+    },
+    {
+      Header: "Price",
+      accessor: "daily",
+      Cell: row => {
+      let color = row.row.original.oneDayChange > 0 ? GREEN : RED;
+      return <span style={{"color" : color}}>{formatGp(row.row.original.daily)}</span>;
+    }
+    },
+    {
+      Header: "Volume",
+      accessor: "volume",
+      Cell: row => formatGp(row.row.original.volume)
+    }
+  ];
+
+  let expandedColumns = [
+    {
+        Header: "Change (1d)",
+        accessor: "oneDayChange",
+        Cell: row => formatPercentChange(row.row.original.oneDayChange)
+      },
+      {
+        Header: "Change (7d)",
+        accessor: "oneWeekChange",
+        Cell: row => formatPercentChange(row.row.original.oneWeekChange)
+      },
+      {
+        Header: "Change (1m)",
+        accessor: "oneMonthChange",
+        Cell: row => formatPercentChange(row.row.original.oneMonthChange)
+      }
+  ]
+
+  const columns = React.useMemo(
+    () => expanded ? basicColumns.concat(expandedColumns) : basicColumns,
+    [expanded, basicColumns, expandedColumns]
   );
 
   const {
@@ -128,18 +147,27 @@ function Table({ data, metadata, onSelect, selected }) {
     getTableBodyProps,
     headerGroups,
     rows,
-    prepareRow
+    prepareRow,
+    pageOptions,
+    page,
+    state: { pageIndex},
+    previousPage,
+    nextPage,
+    canPreviousPage,
+    canNextPage,
   } = useTable(
     {
       columns,
-      data
+      data,
+      initialState: { pageIndex: 0, pageSize: pgSize}
     },
-    useSortBy
+    useSortBy,
+    usePagination
   );
 
   // Render the UI for your table
-
   return (
+    <>
     <MaUTable {...getTableProps()}>
       <TableHead>
         {headerGroups.map(headerGroup => (
@@ -158,7 +186,7 @@ function Table({ data, metadata, onSelect, selected }) {
         ))}
       </TableHead>
       <TableBody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
+        {page.map((row, i) => {
           prepareRow(row);
           return (
             <TableRow
@@ -166,7 +194,6 @@ function Table({ data, metadata, onSelect, selected }) {
               onClick={() => {
                 onSelect(row.original.id);
               }}
-              // style={{ background: row.original.id === selected ? RED : BG }}
               {...row.getRowProps()}
             >
               {row.cells.map(cell => {
@@ -181,6 +208,23 @@ function Table({ data, metadata, onSelect, selected }) {
         })}
       </TableBody>
     </MaUTable>
+    <div className="Footer">
+      <Button onClick={() => previousPage()} disabled={!canPreviousPage}>
+        Prev
+      </Button>
+      <div>
+        Page{' '}
+        <em>
+          {pageIndex + 1} of {pageOptions.length}
+        </em>
+      </div>
+      <Button onClick={() => nextPage()} disabled={!canNextPage}>
+        Next
+      </Button>
+
+
+    </div>
+    </>
   );
 }
 

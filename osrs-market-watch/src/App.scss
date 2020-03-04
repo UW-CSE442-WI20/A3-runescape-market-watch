@@ -2,7 +2,7 @@
 
 $bg: #303030;
 $text: #222;
-$red: #8a3535;
+$primary: #212121;
 
 html {
   background: $bg;
@@ -15,27 +15,61 @@ html {
   }
 
   &.Selected {
-    background: $red !important;
+    background: $primary !important;
   }
+}
+
+.Wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .Container {
   display: grid;
   grid-template-columns: 400px auto;
-  height: 100vh;
+  height: 100%;
 
   &.Expanded {
     grid-template-columns: auto;
   }
 
   .Sidebar {
-    border: 1px solid black;
-    overflow-y: auto;
-    overflow-x: hidden;
+    border-right: 1px solid #515151;
+    height: 100%;
     display: grid;
-    grid-template-areas: "search"
-                         "items";
-    grid-template-rows: auto 1fr;
+    grid-template-areas: "header"
+                         "search"
+                         "items"
+                         "footer";
+    grid-template-rows: auto auto 1fr auto;
 
+    .Header {
+      padding-left: 8px;
+      padding-top: 8px;
+      grid-area: header;
+      display: flex;
+
+      .Logo {
+        text-align: center;
+        font-size: 18px;
+        padding-left: 8px;
+        padding-top: 4px;
+      }
+    }
+
+    .Footer {
+      grid-area: footer;
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+
+      & > * {
+        flex-grow: 1;
+        text-align: center;
+        padding: 4px;
+        font-size: 16px;
+      }
+    }
     .SearchBarContainer {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -44,13 +78,14 @@ html {
       grid-area: search;
 
       .Searchbar {
-        height: 20px;
+        height: 100%;
+
       }  
     }
 
     .ItemsContainer {
       grid-area: items;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     .SidebarItem {
