@@ -26,8 +26,8 @@ class PriceVolumeChart extends Component {
     this.volumeHeight = 0.2 * this.props.height;
     
     // Chart colors
-    this.red = "#60d68a";
-    this.green = "#d66061";
+    this.green = "#60d68a";
+    this.red = "#d66061";
 
     this.zoomed = this.zoomed.bind(this);
   }
@@ -204,8 +204,8 @@ class PriceVolumeChart extends Component {
 
   updatePriceChart(xScale) {
     const chartHeight = this.priceHeight - this.margin.xbuffer;
-    const xMin = xScale.invert(0);
-    const xMax = xScale.invert(this.chartWidth);
+    const xMin = xScale.invert(0 - this.margin.left);
+    const xMax = xScale.invert(this.chartWidth + this.margin.right);
     const data = this.props.data.filter(d => d.ts > xMin && d.ts < xMax);
 
     const yMin = Math.min(d3.min(data, d => d.daily), d3.min(data, d => d.average)) - 5
@@ -241,21 +241,21 @@ class PriceVolumeChart extends Component {
             .attr("id", "dailyline")
             .attr("fill", "none")
             .attr("stroke", "steelblue")
-            .attr("stroke-width", 5.0)
+            .attr("stroke-width", 3.0)
             .attr("d", dailyLine)
           group.append("path")
             .attr("id", "averageline")
             .attr("fill", "none")
             .attr("stroke", "goldenrod")
-            .attr("stroke-width", 5.0)
+            .attr("stroke-width", 3.0)
             .attr("d", averageLine)
         },
         update => {
           update.select("#dailyline")
-            .transition().duration(0)
+            // .transition().duration(0)    // Do we need these, was glitchy earlier but seems fine now
             .attr("d", dailyLine)
           update.select("#averageline")
-            .transition().duration(0)
+            // .transition().duration(0)
             .attr("d", averageLine)
         },
         exit => exit.remove()
@@ -264,9 +264,12 @@ class PriceVolumeChart extends Component {
 
   updateVolumeChart(xScale) {
     const chartHeight = this.volumeHeight - this.margin.xbuffer - this.margin.bottom;
-    const xMin = xScale.invert(0);
-    const xMax = xScale.invert(this.chartWidth);
+    const xMin = xScale.invert(0 - this.margin.left);
+    const xMax = xScale.invert(this.chartWidth + this.margin.right);
     const data = this.props.data.filter(d => d.ts > xMin && d.ts < xMax);
+
+    console.log(d3.max(this.props.data, d => d.ts));
+    
 
     const yScale = d3.scaleLinear()
       .domain(d3.extent(data, d => d.volume))
@@ -276,7 +279,7 @@ class PriceVolumeChart extends Component {
       .call( d3.axisBottom(xScale) )
 
     this.volumeChart.select("#yAxis")
-      .call(d3.axisRight(yScale).tickFormat(this.volFormat));
+      .call(d3.axisRight(yScale).tickFormat(this.volFormat).ticks(6));
 
     const bandwidth = this.chartWidth / (data.length + 2);
     this.volumeChart
@@ -287,7 +290,7 @@ class PriceVolumeChart extends Component {
           .attr("class", "volume_bar")
           .attr("clip-path", "url(#volumeclip)")
           .append("rect")
-          .attr("fill", "steelblue")
+          .attr("fill", "gray")
           .attr("x", d => xScale(d.ts))
           .attr("y", d => yScale(d.volume))
           .attr("width", d => bandwidth)
