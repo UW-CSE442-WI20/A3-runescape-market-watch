@@ -13,6 +13,9 @@ import { createMuiTheme } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import { Input, Button } from '@material-ui/core';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCaretUp, faCaretDown, faWindowMaximize, faWindowMinimize } from '@fortawesome/free-solid-svg-icons'
+
 const PRIMARY = "#212121";
 const RED = "#d66061";
 const GREEN = "#60d68a";
@@ -33,8 +36,8 @@ class PriceTable extends Component {
   render() {
 
     // subtract search bar, header, header, and footer heights...
-    const TABLE_HEIGHT = this.props.height - 56 - 56 - 36 - 34;
-    const TABLE_ROW_HEIGHT = 54;
+    const TABLE_HEIGHT = this.props.height - 56 - 56 - 40 - 40;
+    const TABLE_ROW_HEIGHT = 40;
 
     return (
       <div className="Sidebar">
@@ -54,7 +57,11 @@ class PriceTable extends Component {
           <Button
             onClick={this.props.toggleExpand}
             className="ExpandButton">
-              {this.props.expanded ? '<<' : '>>'}
+              {
+                this.props.expanded ?
+                  <FontAwesomeIcon icon={faWindowMinimize}/> :
+                  <FontAwesomeIcon icon={faWindowMaximize}/>
+              }
           </Button>
         </div>
           <CssBaseline />
@@ -108,9 +115,25 @@ function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded 
       Header: "Price",
       accessor: "daily",
       Cell: row => {
-      let color = row.row.original.oneDayChange > 0 ? GREEN : RED;
-      return <span style={{"color" : color}}>{formatGp(row.row.original.daily)}</span>;
-    }
+        let color = row.row.original.oneDayChange > 0 ? GREEN : RED;
+        let symbol = row.row.original.oneDayChange > 0 ? faCaretUp : faCaretDown;
+        let fontSize = 16;
+        if (row.row.original.oneDayChange === 0) {
+          color = "steelblue";
+          fontSize = 12;
+          symbol = null;
+        }
+        return (
+          <span>
+            {`${formatGp(row.row.original.daily)} `}
+            {
+              symbol ? 
+                <FontAwesomeIcon icon={symbol} style={{"color" : color, "fontSize" : fontSize}}/> :
+                null
+            }
+           
+          </span>);
+      }
     },
     {
       Header: "Volume",

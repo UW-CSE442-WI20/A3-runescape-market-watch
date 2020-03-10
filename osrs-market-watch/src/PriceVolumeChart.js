@@ -17,6 +17,7 @@ class PriceVolumeChart extends Component {
 
     this.gpFormat = gp => `${d3.format(".3~s")(gp)} gp`;
     this.volFormat = d3.format(".3~s");
+    this.legendFormat = d3.format(".5~s");
 
     this.candleData = this.generateCandlestickData(this.props.data, this.period);
 
@@ -28,8 +29,18 @@ class PriceVolumeChart extends Component {
     // Chart colors
     this.green = "#60d68a";
     this.red = "#d66061";
+    this.text = "#e7e7e7";
 
     this.zoomed = this.zoomed.bind(this);
+    this.drawChart = this.drawChart.bind(this);
+    this.renderCandleLegend = this.renderCandleLegend.bind(this);
+    this.renderVolumeLegend = this.renderVolumeLegend.bind(this);
+    this.renderPriceLegend = this.renderPriceLegend.bind(this);
+    this.renderChartTitle = this.renderChartTitle.bind(this);
+
+    this.state = {
+      currentDate: null
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -51,7 +62,105 @@ class PriceVolumeChart extends Component {
   }
 
   render() {
-    return <div ref={this.node} />;
+    return <><div ref={this.node} />
+      {/* {this.renderChartTitle()} */}
+      {this.renderCandleLegend()}
+      {this.renderPriceLegend()}
+      {this.renderVolumeLegend()}
+    </>;
+  }
+
+  renderChartTitle() {
+    const { metadata } = this.props;
+
+    return (
+      <div className="ChartTitle">
+        <img className="LegendIcon" src={metadata.icon}></img>
+        <div className="ItemName">{metadata.name}</div>
+    </div>
+    );
+
+  }
+
+  renderCandleLegend() {
+    let { currentDate } = this.state;
+    const { metadata } = this.props;
+
+    if (currentDate === null) {
+      currentDate = this.props.data[this.props.data.length - 1].ts;
+    }
+
+    let curr = this.props.data.find(d => d.ts === currentDate);
+    let currCandle = this.candleData.find(d => d.start <= currentDate && d.end >= currentDate);
+
+    let hi, low, open, close, daily, average, volume;
+    if (currCandle) {
+      hi = currCandle.high;
+      low = currCandle.low;
+      open = currCandle.open;
+      close = currCandle.close;
+    }
+
+    if (curr) {
+      daily = curr.daily;
+      average = curr.average;
+      volume = curr.volume;
+    }
+
+    return (
+      <div className="Legend" style={{"top" : 0}}>
+        <div className="LegendHeader">
+          <img className="LegendIcon" src={metadata.icon}></img>
+          <div className="ItemName">{metadata.name.replace(/_/g, ' ')}</div>
+        </div>
+        {/* <div className="Label">{`Date: ${currentDate}`}</div> */}
+        <div className="Label">{`Open: `}<span className="Value">{this.legendFormat(open)}</span></div>
+        <div className="Label">{`Close: `}<span className="Value">{this.legendFormat(close)}</span></div>
+        <div className="Label">{`High: `}<span className="Value">{this.legendFormat(hi)}</span></div>
+        <div className="Label">{`Low: `}<span className="Value">{this.legendFormat(low)}</span></div>
+      </div>
+    );
+  }
+
+  renderVolumeLegend() {
+    let { currentDate } = this.state;
+
+    if (currentDate === null) {
+      currentDate = this.props.data[this.props.data.length - 1].ts;
+    }
+
+    let curr = this.props.data.find(d => d.ts === currentDate);
+
+    let volume = curr ? curr.volume : null;
+
+    return (
+      <div className="Legend" style={{"top" : this.candleHeight + this.priceHeight}}>
+        <div className="Label">{`Volume: `}<span className="Value">{this.legendFormat(volume)}</span></div>
+      </div>
+    );
+  }
+
+  renderPriceLegend() {
+    let { currentDate } = this.state;
+
+    if (currentDate === null) {
+      currentDate = this.props.data[this.props.data.length - 1].ts;
+    }
+
+    let curr = this.props.data.find(d => d.ts === currentDate);
+    let daily, average;
+
+    if (curr) {
+      daily = curr.daily;
+      average = curr.average;
+    }
+
+    return (
+      <div className="Legend" style={{"top" : this.candleHeight }}>
+        <div className="Label Blue">{`Daily: `}<span className="Value">{this.legendFormat(daily)}</span></div>
+        <div className="Label Orange">{`Average: `}<span className="Value">{this.legendFormat(average)}</span></div>
+      </div>
+    );
   }
 
   buildCandlestickChart(chartArea, xScale) {
@@ -80,6 +189,8 @@ class PriceVolumeChart extends Component {
       .append("g")
       .attr("id", "yAxis")
       .attr("transform", `translate(${this.chartWidth}, 0)`)
+
+
 
     this.updateCandlestickChart(xScale);
   }
@@ -268,7 +379,6 @@ class PriceVolumeChart extends Component {
     const xMax = xScale.invert(this.chartWidth + this.margin.right);
     const data = this.props.data.filter(d => d.ts > xMin && d.ts < xMax);
 
-    console.log(d3.max(this.props.data, d => d.ts));
     
 
     const yScale = d3.scaleLinear()
@@ -335,39 +445,45 @@ class PriceVolumeChart extends Component {
     this.buildVolumeChart(volumeArea, this.xScale);
 
     // CROSSHAIR ////////////////////////////////////////////////////////////// 
-    // svg
-    //   .append("line")
-    //   .classed("x", true)
-    //   .style("fill", "none")
-    //   .style("pointer-events", "all")
-    //   .style("stroke", "#67809f")
-    //   .style("stroke-width", "1.5px")
-    //   .style("stroke-dasharray", "3 3");
+    svg
+      .append("line")
+      .classed("x", true)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .style("stroke", this.text)
+      .style("stroke-width", "1.5px");
 
-      // svg
-      // .on("mousemove", generateCrosshair)
+
+    const bisectDate = d3.bisector(d => d.ts).left;
+    const { xScale, margin } = this;
+    const { data, height } = this.props;
+    let updateCurrDate = (d) => this.setState({currentDate : d})
+
+    function generateCrosshair() {
+      const date = xScale.invert(d3.mouse(this)[0] - margin.left);
+      const i = bisectDate(data, date, 1, data.length - 1);
+      const d0 = data[i - 1];
+      const d1 = data[i];
+      const currData = (date - d0.ts) > (d1.ts - date) ? d1 : d0;
+      const currX = xScale(currData.ts)
+      svg
+        .select("line.x")
+        .attr("x1", 0)
+        .attr("x2", 0)
+        .attr("y1", 0)
+        .attr("y2", height)
+        .attr("transform", `translate(${margin.left + currX}, 0)`);
+        updateCurrDate(currData.ts);
+    }
+
+
+    svg
+      .on("mousemove", generateCrosshair)
       // .on("mouseover", () => priceFocus.style("display", null))
       // .on("mouseout", () => {
       //   priceFocus.style("display", "none");
       //   volumeChart.selectAll("rect").attr("fill", "steelblue");
       // });
-
-    // const bisectDate = d3.bisector(d => d.ts).left;
-    // function generateCrosshair() {
-    //   const date = this.xScale.invert(d3.mouse(this)[0] - this.margin.left);
-    //   const i = bisectDate(data, date, 1, data.length - 1);
-    //   const d0 = data[i - 1];
-    //   const d1 = data[i];
-    //   const currData = (date - d0.ts) > (d1.ts - date) ? d1 : d0;
-    //   const currX = this.xScale(currData.ts)
-    //   svg
-    //     .select("line.x")
-    //     .attr("x1", 0)
-    //     .attr("x2", 0)
-    //     .attr("y1", 0)
-    //     .attr("y2", height)
-    //     .attr("transform", `translate(${this.margin.left + currX}, 0)`);
-    // }
 
     const zoom = d3.zoom()
       .scaleExtent([1, 4])
@@ -380,7 +496,7 @@ class PriceVolumeChart extends Component {
 
   generateCandlestickData(data, period) {
     let condensed = [];
-    for (var i = 0; i < data.length - 1; i += period) {
+    for (var i = 0; i < data.length - 1; i += period - 1) {
       const frame = data.slice(i, i + period);
       const candle = {
         "id"     : i,

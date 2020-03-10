@@ -183,7 +183,8 @@ class App extends Component {
             height={chartHeight}/>
           <div className={expanded ? "Content Expanded" : "Content"}>
             <div className="ChartContainer" ref={this.chart} style={{margin: 0}}>
-              <PriceVolumeChart data={chartData}
+              <PriceVolumeChart metadata={metadata}
+                                data={chartData}
                                 width={chartWidth}
                                 height={chartHeight} />
             </div>
