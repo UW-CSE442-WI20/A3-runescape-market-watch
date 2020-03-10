@@ -3,6 +3,7 @@
   "homepage": "http://UW-CSE442-WI20.github.io/A3-runescape-market-watch/",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5000",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",

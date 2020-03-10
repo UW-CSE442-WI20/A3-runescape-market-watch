@@ -24,6 +24,7 @@ const BG = "#303030";
 class PriceTable extends Component {
   constructor(props) {
     super(props);
+    console.log(props.metadata)
     this.metadata = props.metadata;
     this.theme = createMuiTheme({
       palette: {
@@ -104,7 +105,7 @@ function Table({ data, metadata, onSelect, selected, formatGp, pgSize, expanded 
             <img
               height={24}
               style={{ marginBottom: "-8px" }}
-              src={metadata[row.row.original.id].icon}
+              src={`data:image/png;base64,${row.row.original.icon}`}
             />
             {row.row.original.name}
           </div>

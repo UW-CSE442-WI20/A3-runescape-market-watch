@@ -41,6 +41,9 @@ class PriceVolumeChart extends Component {
     this.state = {
       currentDate: null
     }
+
+    console.log(this.props.data)
+
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -110,7 +113,7 @@ class PriceVolumeChart extends Component {
     return (
       <div className="Legend" style={{"top" : 0}}>
         <div className="LegendHeader">
-          <img className="LegendIcon" src={metadata.icon}></img>
+          <img className="LegendIcon" src={`data:image/png;base64,${metadata.icon}`}></img>
           <div className="ItemName">{metadata.name.replace(/_/g, ' ')}</div>
         </div>
         {/* <div className="Label">{`Date: ${currentDate}`}</div> */}

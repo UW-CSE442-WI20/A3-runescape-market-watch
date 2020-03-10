@@ -18,7 +18,11 @@ class App extends Component {
       loading: true,
       items: null,
       activeItemId: null,
-      expanded: false
+      expanded: false,
+      priceData: null,
+      candleData: null,
+      sidebarItems: [],
+      filteredItems: [],
     };
     this.chart = React.createRef();
     this.csvToJson = this.csvToJson.bind(this);
@@ -26,19 +30,23 @@ class App extends Component {
     this.toggleExpand = this.toggleExpand.bind(this);
     this.filterSidebar = this.filterSidebar.bind(this);
     this.onSidebarSelect = this.onSidebarSelect.bind(this);
+    this.processMetadata = this.processMetadata.bind(this);
   }
 
   // async load the csv file
   componentDidMount() {
-    Papa.parse('./data.csv', {
-      complete: this.csvToJson,
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      delimiter: ','
-    });
+    // Papa.parse('./data.csv', {
+    //   complete: this.csvToJson,
+    //   download: true,
+    //   header: true,
+    //   skipEmptyLines: true,
+    //   delimiter: ','
+    // });
     
     window.addEventListener('resize', this.onResize, false);
+    fetch('/market_watch_api/metadata', {})
+      .then(response => response.json())
+      .then(data => this.processMetadata(data));
     this.onResize();
   }
 
@@ -50,6 +58,47 @@ class App extends Component {
     this.setState(
       { chartWidth: window.innerWidth - SIDEBAR_WIDTH,
         chartHeight: window.innerHeight - ITEM_HEADER_HEIGHT - TITLE_HEIGHT});
+  }
+
+  processMetadata(metadata) {
+    let percentChange = (start, end) => Math.round(1000 * (start - end) / start) / 10;
+    let sidebarItems = [];
+    let itemMap = {};
+
+    console.log(metadata)
+
+    
+    for (let i in metadata) {
+      let item = metadata[i];
+      sidebarItems.push({
+        name: item.name,
+        average: item.price,        // TEMPORARY!!! TODO!!!!!
+        daily: item.price,
+        volume: item.volume,
+        id: item.item_id,
+        icon: item.icon,
+        buy_limit: item.buy_limit,
+        oneDayChange: 0.5,
+        oneWeekChange: 0.5,
+        oneMonthChange: 0.5
+      });
+
+    }
+
+    fetch(`/market_watch_api/prices?id=${sidebarItems[0].id}`, {})
+      .then(response => response.json())
+      .then(data => { 
+        console.log(data)
+        this.setState({
+          loading: false,
+          items: itemMap,
+          sidebarItems: sidebarItems,
+          filteredItems: sidebarItems,
+          activeItemId: sidebarItems[0].id,
+          priceData: data,
+          candleData: null
+        });
+      })
   }
 
   csvToJson(csvData) {
@@ -116,7 +165,12 @@ class App extends Component {
   }
 
   onSidebarSelect(id) {
-    this.setState({activeItemId: id})
+    fetch(`/market_watch_api/prices?id=${id}`, {})
+      .then(response => response.json())
+      .then(data => {
+        this.setState({activeItemId: id, priceData: data })
+
+      })
   }
   
   filterSidebar(e) {
@@ -152,15 +206,13 @@ class App extends Component {
     }
 
     const { activeItemId, chartWidth, chartHeight } = this.state;
-    const metadata = ItemMetadata[activeItemId]; // type, image urls
-    const pricedata = this.state.sidebarItems.filter((e) => e.id === activeItemId)[0]; // daily values, and image
-    const pricehistory = this.state.items[activeItemId]; // full price history
-
+    const metadata = this.state.sidebarItems.find((e => e.id === activeItemId));
+    const pricehistory = this.state.priceData;
 
     const chartData = pricehistory.map((row) => ({
       'ts': new Date(row['ts']),
-      'daily': +row['daily'],
-      'average': +row['average'],
+      'daily': +row['price'],
+      'average': +row['price'],         // TODO TEMPORARY AVERAGE FIX!!!
       'volume': +row['volume']
     }))
 
@@ -173,7 +225,7 @@ class App extends Component {
         <div className={expanded ? "Container Expanded" : "Container"}>
           <PriceTable
             items={this.state.filteredItems}
-            metadata={ItemMetadata}
+            metadata={this.state.sidebarItems}
             filterSidebar={this.filterSidebar}
             activeItemId={this.state.activeItemId}
             onSelect={this.onSidebarSelect}
