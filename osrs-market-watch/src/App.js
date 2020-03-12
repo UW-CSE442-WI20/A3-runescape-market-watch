@@ -157,7 +157,7 @@ class App extends Component {
       
       return (
         <div className={className} key={i} onClick={() => this.setState({activeItemId: item.id})}>
-          <img className="SidebarItemImage" src={src} alt={"MEANINGFUL ALT TEXT"}/>
+          <img className="SidebarItemImage" src={src} alt={item.name}/>
           <p>{item.name}</p>
         </div>
       );
@@ -169,7 +169,6 @@ class App extends Component {
       .then(response => response.json())
       .then(data => {
         this.setState({activeItemId: id, priceData: data })
-
       })
   }
   
